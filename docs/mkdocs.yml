@@ -1,0 +1,42 @@
+site_name: AeroNode
+nav:
+  - 'index.md'
+  - 'installation.md'
+  - 'how-to-do-x/index.md'
+repo_url: https://github.com/akxcix/aeronode-docs/
+edit_uri: blob/main/docs/
+theme:
+  name: material
+  locale: en
+  features:
+    - content.action.edit
+  palette:
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/link
+        name: Switch to light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/toggle-switch
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: black
+      accent: indigo
+      toggle:
+        icon: material/toggle-switch-off
+        name: Switch to system preference
+  font:
+    text: Roboto
+    code: Roboto Mono
+
+plugins:
+  - material-plausible
+
+extra:
+  analytics:
+    provider: plausible
+    domain: docs.aeronode.io
