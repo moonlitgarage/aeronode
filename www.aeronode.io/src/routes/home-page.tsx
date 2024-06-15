@@ -1,6 +1,7 @@
+import { LINK_DOCS, LINK_GITHUB } from "@/common/constants";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { H1, H3, H4} from "@/components/ui/typography";
+import { H1, H3, List } from "@/components/ui/typography";
 import { Link } from "react-router-dom";
 
 export default function HomePage() {
@@ -18,22 +19,30 @@ export default function HomePage() {
                     </H3>
                 </div>
             </div>
-            <div className="flex flex-row p-6 space-x-4 text-justify">
+            <div className="flex flex-row p-6 space-x-4">
                 <Card className="w-1/2 flex flex-col">
                     <CardHeader>
                         <CardTitle>
-                            Docs
+                            Learn how to use Aeronode
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="grow">
-                        <H4>
-                        Check out the docs to get started with aeronode.
-                        </H4>
+                        <List>
+                            <li>
+                            Learn how to set up and use Aeronode.
+                            </li>
+                            <li>
+                            Explore the API and firmware documentation.
+                            </li>
+                            <li>
+                            Get started with your own drone project.
+                            </li>
+                        </List>
                     </CardContent>
                     <CardFooter>
-                        <Link to={"https://docs.aeronode.io"}>
+                        <Link to={LINK_DOCS}>
                             <Button>
-                                Get Started
+                                Read the docs
                             </Button>
                         </Link>
                     </CardFooter>
@@ -41,26 +50,26 @@ export default function HomePage() {
                 <Card className="w-1/2">
                     <CardHeader>
                         <CardTitle>
-                            Code
+                            Discover the code
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <H4>
-                        Aeronode is open source.
-
-                        </H4>
-                        <br />
-                        <H4>
-                        All of it: the board, the firmware, and the api.
-
-                        </H4>
-                        <br />
-                        Check it out on github.
+                        <List>
+                            <li>
+                            Explore Aeronode's open-source repository.
+                            </li>
+                            <li>
+                            Access the board, firmware, and API codebase.
+                            </li>
+                            <li>
+                            Contribute to the project or use it in your own drone applications.
+                            </li>
+                        </List>
                     </CardContent>
                     <CardFooter>
-                        <Link to={"https://github.com/aeronode"}>
+                        <Link to={LINK_GITHUB}>
                             <Button>
-                                Github
+                                View on GitHub
                             </Button>
                         </Link>
                     </CardFooter>

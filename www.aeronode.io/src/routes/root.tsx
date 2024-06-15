@@ -1,6 +1,7 @@
 import { Outlet } from "react-router-dom";
 import Navbar from "@/components/navbar";
 import WaitlistWidget from "@/widgets/waitlist";
+import Footer from "@/components/footer";
 
 export default function Root() {
     return (
@@ -20,8 +21,8 @@ export default function Root() {
                             <div className="p-4">
                                 <WaitlistWidget />
                             </div>
-                            {/* <div className="grow" />
-                            <Footer /> */}
+                            <div className="grow" />
+                            <Footer />
                         </div>
                     </div>
                 </div>
