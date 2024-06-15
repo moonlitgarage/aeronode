@@ -41,7 +41,7 @@ export default function HomePage() {
                     </CardContent>
                     <CardFooter>
                         <Link to={LINK_DOCS}>
-                            <Button>
+                            <Button variant={"outline"}>
                                 Read the docs
                             </Button>
                         </Link>
@@ -68,7 +68,7 @@ export default function HomePage() {
                     </CardContent>
                     <CardFooter>
                         <Link to={LINK_GITHUB}>
-                            <Button>
+                            <Button variant={"outline"}>
                                 View on GitHub
                             </Button>
                         </Link>
