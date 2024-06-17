@@ -5,7 +5,7 @@ edition = "2021"
 license = "MIT"
 description = "AeroAPI is a Rust library for interacting with the firmware for aeronode"
 homepage = "https://docs.aeronode.io"
-repository = "https://github.com/koerolabs/aeronode/aeronode"
+repository = "https://github.com/koerolabs/aeronode/aeroapi"
 readme = "readme.md"
 
 [dependencies]
