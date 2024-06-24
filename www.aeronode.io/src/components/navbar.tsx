@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { ModeToggle } from "@/components/mode-toggle";
 import Logo from "../../public/logo.png";
 import { Avatar, AvatarImage } from "./ui/avatar";
+import { LINK_DOCS, LINK_GITHUB } from "@/common/constants";
 
 const headerLinks = [
     {
@@ -10,18 +11,18 @@ const headerLinks = [
     },
     {
         name: 'github',
-        link: 'https://github.com/aeronode'
+        link: LINK_GITHUB
     },
     {
         name: 'docs',
-        link: 'https://docs.aeronode.io'
+        link: LINK_DOCS
     },
 ];
 
 export default function Navbar() {
     return (
         <div id="header">
-            <header className="sticky top-0 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6">
+            <header className="sticky top-0 flex h-16 items-center gap-4 border-dashed border-b bg-background px-4 md:px-6">
                 <nav className="flex flex-row items-center gap-5 text-sm">
                     <Link to="/">
                     <div className="cursor-pointer hover:bg-gray-200 rounded-full p-0.5">
