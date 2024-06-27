@@ -4,3 +4,9 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+rp2040-hal = {version = "0.10.1" }
+rp2040-boot2 = { version = "0.3" }
+cortex-m = {version = "0.7", features = ["critical-section-single-core"]}
+cortex-m-rt = {version = "0.7.3"}
+embedded-hal = "1.0.0"
+panic-halt = "0.2.0"
