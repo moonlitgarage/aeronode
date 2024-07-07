@@ -1,0 +1,15 @@
+[target.'cfg(all(target_arch = "arm", target_os = "none"))']
+runner = "elf2uf2-rs -d"
+
+[build]
+target = "thumbv6m-none-eabi"        # Cortex-M0 and Cortex-M0+
+
+# rustflags = [
+#     "-C", "link-arg=--nmagic",
+#     "-C", "link-arg=-Tlink.x",
+#     "-C", "inline-threshold=5",
+#     "-C", "no-vectorize-loops",
+# ]
+
+[env]
+DEFMT_LOG = "debug"
