@@ -1,83 +1,60 @@
-use rp2040_hal as rp;
-
-use embedded_hal::delay::DelayNs;
-use embedded_hal::digital::OutputPin;
+use embassy_rp::{gpio::{Level, Output}, i2c::{I2c, Config, Blocking}, peripherals::{I2C0, PIN_13}};
 
 use crate::core::controller::{Controller, PinState};
 
-const FREQ_CRYSTAL: u32 = 12_000_000; // 12 MHz
-
-pub struct RP {
-    timer: rp::Timer,
-    pin13: rp2040_hal::gpio::Pin<rp2040_hal::gpio::bank0::Gpio13, rp2040_hal::gpio::FunctionSio<rp2040_hal::gpio::SioOutput>, rp2040_hal::gpio::PullDown>
+// pinout used: https://learn.adafruit.com/assets/120082
+// todo: abstract pin assignment out for usage amongst different 
+// boards of the same family
+pub struct RP<'a> {
+    internal_led: Output<'a, PIN_13>,
+    i2c0: I2c<'a, I2C0, Blocking>,
 }
 
-enum Pin {
-    Gpio13,
-}
-
-impl RP {
+impl RP<'_> {
     pub fn new() -> Self {
-        let mut pac = rp::pac::Peripherals::take().unwrap();
-        let mut watchdog = rp::Watchdog::new(pac.WATCHDOG);
+        let p = embassy_rp::init(Default::default());
 
-        let clocks = rp::clocks::init_clocks_and_plls(
-            FREQ_CRYSTAL,
-            pac.XOSC,
-            pac.CLOCKS,
-            pac.PLL_SYS,
-            pac.PLL_USB,
-            &mut pac.RESETS,
-            &mut watchdog,
-        )
-        .unwrap();
+        let internal_led = Output::new(p.PIN_13, Level::Low);
+        let sda = p.PIN_0;
+        let scl = p.PIN_1;
 
-        let timer = rp2040_hal::Timer::new(pac.TIMER, &mut pac.RESETS, &clocks);
-
-        let sio = rp::Sio::new(pac.SIO);
-        let pins = rp::gpio::Pins::new(
-            pac.IO_BANK0,
-            pac.PADS_BANK0,
-            sio.gpio_bank0,
-            &mut pac.RESETS,
+        let i2c0 = embassy_rp::i2c::I2c::new_blocking(
+            p.I2C0,
+            scl, 
+            sda, 
+            Config::default(),
         );
 
-        let pin13 = pins.gpio13.into_push_pull_output();
-
-        Self { 
-            timer, 
-            pin13 
+        Self {
+            internal_led,
+            i2c0,
         }
     }
 }
 
-impl RP {
-
-    fn get_pin(&mut self, pin: Pin) -> &mut impl OutputPin {
-        match pin {
-            Pin::Gpio13 => &mut self.pin13,
+impl From<PinState> for Level {
+    fn from(pin_state: PinState) -> Self {
+        match pin_state {
+            PinState::High => Level::High,
+            PinState::Low => Level::Low,
         }
     }
+}
 
-    fn set_pin_state(&mut self, pin_name: Pin, state: PinState) {
-        let pin = self.get_pin(pin_name);
-        match state {
+
+impl Controller for RP<'_> {
+    fn manage_onboard_led(&mut self, pin_state: PinState) {
+        match pin_state {
             PinState::High => {
-                pin.set_high().unwrap();
+                self.internal_led.set_high();
             }
             PinState::Low => {
-                pin.set_low().unwrap();
+                self.internal_led.set_low();
             }
         }
     }
 
-    pub fn delay_ms(&mut self, ms: u32) {
-        self.timer.delay_ms(ms);
-    }
-}
-
-impl Controller for RP {
-    fn manage_onboard_led(&mut self, pin_state: PinState) {
-        self.set_pin_state(Pin::Gpio13, pin_state)
+    fn write_to_i2c(&mut self, addr: u8, data: &[u8]) -> Result<(), ()> {
+        self.i2c0.blocking_write(addr, data).map_err(|_| ())
     }
 }
