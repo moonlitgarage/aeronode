@@ -1,6 +1,6 @@
 import serial
-from bridge.drone import SensorData
-from bridge.controller import ControlInput
+from simulations.abstractdrone import SensorData
+from rpc.controller import ControlInput
 from bridge.abstractconn import AbstractConn
 
 PORT = '/dev/tty.usbmodem11'

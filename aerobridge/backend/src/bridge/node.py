@@ -2,8 +2,8 @@ import logging
 from bridge.abstractconn import AbstractConn
 from bridge.preprogrammedconn import PreProgrammed
 from bridge.serialwrapper import SerialWrapper
-from bridge.controller import ControlInput
-from bridge.drone import SensorData
+from rpc.controller import ControlInput
+from simulations.abstractdrone import SensorData
 
 class Node:
     def __init__(self):

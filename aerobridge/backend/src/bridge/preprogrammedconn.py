@@ -1,6 +1,6 @@
 from bridge.abstractconn import AbstractConn
-from bridge.controller import ControlInput, create_control_input
-from bridge.drone import SensorData
+from rpc.controller import ControlInput, create_control_input
+from simulations.abstractdrone import SensorData
 
 class PreProgrammed(AbstractConn):
     def __init__(self):

@@ -1,6 +1,6 @@
 import abc
-from bridge.drone import SensorData
-from bridge.controller import ControlInput
+from simulations.abstractdrone import SensorData
+from rpc.controller import ControlInput
 
 class AbstractConn(abc.ABC):
     @abc.abstractmethod

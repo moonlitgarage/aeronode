@@ -1,7 +1,7 @@
 import abc
 from typing import Dict, Any
 from dataclasses import dataclass
-from bridge.controller import ControlInput
+from rpc.controller import ControlInput
 
 @dataclass
 class ImuData:

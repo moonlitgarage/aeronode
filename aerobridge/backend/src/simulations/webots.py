@@ -3,8 +3,8 @@ import os
 import threading
 import queue
 from dataclasses import dataclass
-from bridge.controller import create_control_input, ControlInput, ChannelId
-from bridge.drone import AbstractDrone, SensorData, ImuData
+from rpc.controller import create_control_input, ControlInput, ChannelId
+from simulations.abstractdrone import AbstractDrone, SensorData, ImuData
 
 webots_path = '/Applications/Webots.app/Contents/lib/controller/python'
 os.environ['WEBOTS_HOME'] = '/Applications/Webots.app'
@@ -93,13 +93,6 @@ class Webots(AbstractDrone):
         with self.sensor_data_lock:
             roll, pitch, yaw = self.imu.getRollPitchYaw()
             altitude = self.gps.getValues()[2]
-
-            # print("###############################################################")
-            # # print(f"  IMU: {self.imu.getValues()}")
-            # print(f"  GPS: {self.gps.getValues()}")
-            # print(f"  Compass: {self.compass.getValues()}")
-            # print(f"  Gyro: {self.gyro.getValues()}")            
-            # print("###############################################################")
             self.sensor_data = SensorData(ImuData(roll, pitch, yaw), altitude)
 
         roll_velocity, pitch_velocity, _ = self.gyro.getValues()
