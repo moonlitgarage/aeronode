@@ -1,9 +1,13 @@
 from backends.webots import Webots
 from bridge.drone import AbstractDrone
-from bridge.node import Node
-import time
-import threading
+from bridge.controller import Channel, ChannelId, ControlInput
 from enum import Enum
+from xmlrpc.server import SimpleXMLRPCServer
+from xmlrpc.server import SimpleXMLRPCRequestHandler
+import json
+import threading
+import time
+from typing import List
 
 class SupportedBackends(Enum):
     Webots = 1
@@ -15,38 +19,54 @@ def initBackend(backend: SupportedBackends) -> AbstractDrone:
     else:
         raise NotImplementedError()
 
-class AeroBridge:
+class RpcServer:
     def __init__(self):
-        self.drone = initBackend(SupportedBackends.Webots)
+        self.drone = Webots()
+
+    def start(self):
+        # self.drone = initBackend(SupportedBackends.Webots)
         self.drone_thread = threading.Thread(target=self.drone.run)
-        self.telemetry_thread = threading.Thread(target=self.print_telemetry)
-        self.aeronode = Node()
-    
-    def print_telemetry(self):
-        while self.drone.running:
-            sensor_data = self.drone.get_sensor_data()
-            print(f"Telemetry: Roll: {sensor_data.imu.roll}, Pitch: {sensor_data.imu.pitch}, Yaw: {sensor_data.imu.yaw}")
-            print(f"           Altitude: {sensor_data.altitude}")
-            time.sleep(0.5)
-    
-    def run(self):
         self.drone_thread.start()
-        self.telemetry_thread.start()
+        return "Ok"
 
-        try:
-            while True:
-                data = self.drone.get_sensor_data()
-                self.aeronode.send_data(data)
-                ci = self.aeronode.receive_control_input()
-                self.drone.handleControlInput(ci)
-                # self.print_telemetry()
-                time.sleep(0.5)
+    def get_sensor_data(self):
+        sensor_data = self.drone.get_sensor_data()
+        return sensor_data
+        # return json.dumps({
+        #     'imu': {
+        #         'roll': sensor_data.imu.roll,
+        #         'pitch': sensor_data.imu.pitch,
+        #         'yaw': sensor_data.imu.yaw
+        #     },
+        #     'altitude': sensor_data.altitude
+        # })
 
-        except KeyboardInterrupt:
-            print("Program interrupted")
+    def handle_control_input(self, ci_json):
+        # control_input_dict = json.loads(control_input_json)
+        # if control_input_dict is None:
+        #     print("Received None control input")
+        #     return
+        # channels = [
+        #     Channel(ChannelId.LEFT_X, control_input_dict['channels'][0]),
+        #     Channel(ChannelId.LEFT_Y, control_input_dict['channels'][1]),
+        #     Channel(ChannelId.RIGHT_X, control_input_dict['channels'][2]),
+        #     Channel(ChannelId.RIGHT_Y, control_input_dict['channels'][3])
+        # ]
+        # control_input = ControlInput(
+        #     channels,
+        #     switch_1=control_input_dict['switch_1'],
+        #     switch_2=control_input_dict['switch_2']
+        # )
 
-        finally:
-            self.drone.stop()
-            self.drone_thread.join()
-            self.telemetry_thread.join()
-            print("Program finished")
+        ci = ControlInput.from_json(ci_json)
+        print("CI---->", ci)
+        self.drone.handleControlInput(ci)
+        return "HANDLING"
+
+    def stop(self):
+        self.drone.stop()
+        self.drone_thread.join()
+        print("Drone backend stopped")
+
+class RequestHandler(SimpleXMLRPCRequestHandler):
+    rpc_paths = ('/RPC2',)

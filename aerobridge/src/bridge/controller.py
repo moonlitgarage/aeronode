@@ -1,6 +1,7 @@
+import json
 from enum import Enum
-from dataclasses import dataclass, field
-from typing import List
+from dataclasses import dataclass, field, asdict
+from typing import List, Dict, Any
 
 class ChannelId(Enum):
     LEFT_Y = 1
@@ -26,6 +27,7 @@ class Channel:
     def getScaled(self):
         return (self._channel_val / (0.5 * (self._max - self._min))) - 1.0
 
+
 @dataclass
 class ControlInput:
     channels: List[Channel] = field(default_factory=list)
@@ -44,6 +46,56 @@ class ControlInput:
     
     def get_channel_scaled(self, channel_id: ChannelId) -> float:
         return self.get_channel(channel_id).getScaled()
+
+    def to_json(self) -> str:
+        """
+        Serialize the ControlInput object to a JSON string.
+        """
+        return json.dumps(self.to_dict())
+
+    def to_dict(self) -> Dict[str, Any]:
+        """
+        Convert the ControlInput object to a dictionary.
+        """
+        return {
+            "channels": [
+                {
+                    "channel_id": channel.channel_id.name,
+                    "channel_val": channel.channel_val,
+                    "min": channel._min,
+                    "max": channel._max
+                } for channel in self.channels
+            ],
+            "switch_1": self.switch_1,
+            "switch_2": self.switch_2
+        }
+
+    @classmethod
+    def from_json(cls, json_str: str) -> 'ControlInput':
+        """
+        Deserialize a JSON string to a ControlInput object.
+        """
+        data = json.loads(json_str)
+        return cls.from_dict(data)
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> 'ControlInput':
+        """
+        Create a ControlInput object from a dictionary.
+        """
+        channels = [
+            Channel(
+                channel_id=ChannelId[channel['channel_id']],
+                _channel_val=channel['channel_val'],
+                _min=channel['min'],
+                _max=channel['max']
+            ) for channel in data['channels']
+        ]
+        return cls(
+            channels=channels,
+            switch_1=data['switch_1'],
+            switch_2=data['switch_2']
+        )
 
 def create_control_input(channel_values: List[float], switch_1: bool, switch_2: bool) -> ControlInput:
     if len(channel_values) != 4:
