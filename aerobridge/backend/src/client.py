@@ -2,6 +2,7 @@ from bridge.node import Node
 import time
 import xmlrpc.client
 import logging
+from simulations.abstractdrone import SensorData
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -33,10 +34,14 @@ class AeroBridge:
         try:
             while self.running:
                 
-                data = self.server.get_sensor_data()
-                self.node.send_data(data)
-                ci = self.node.receive_control_input().to_json()
-                self.server.handle_control_input(ci)
+                sensor_data_json = self.server.get_sensor_data()
+                sensor_data = SensorData.from_json(sensor_data_json)
+                self.node.send_data(sensor_data)
+                print("HERE1")
+                ci = self.node.receive_control_input()
+                ci_json = ci.to_json()
+                print("HERE2")
+                self.server.handle_control_input(ci_json)
                 time.sleep(0.5)
 
         except KeyboardInterrupt:

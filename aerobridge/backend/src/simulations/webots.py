@@ -18,6 +18,12 @@ k_vertical_p = 3.0
 k_roll_p = 50.0
 k_pitch_p = 30.0
 
+def get_channel_scaled(ci: ControlInput, channel_id: ChannelId) -> float:
+        for channel in ci.channels:
+            if channel.channel_id == channel_id:
+                return (channel.channel_val - channel.min) / (channel.max - channel.min) * 2 - 1
+        raise ValueError(f"Channel {channel_id} not found")
+
 @dataclass
 class Disturbances:
     pitch: float = 0
@@ -27,8 +33,8 @@ class Disturbances:
     @staticmethod
     def mapControlInput(ci: ControlInput) -> 'Disturbances':
         dist = Disturbances()
-        dist.pitch = -2.0 * ci.get_channel_scaled(ChannelId.RIGHT_Y)
-        dist.yaw = -1.3 * ci.get_channel_scaled(ChannelId.LEFT_X)
+        dist.pitch = -2.0 * get_channel_scaled(ci, ChannelId.RightY)
+        dist.yaw = -1.3 * get_channel_scaled(ci, ChannelId.LeftX)
         return dist
 
 def clamp(value, low, high):
@@ -112,8 +118,8 @@ class Webots(AbstractDrone):
         pitch_disturbance = dist.pitch
         yaw_disturbance = dist.yaw
 
-        roll_input = k_roll_p * clamp(self.sensor_data.imu.roll, -1.0, 1.0) + roll_velocity + roll_disturbance
-        pitch_input = k_pitch_p * clamp(self.sensor_data.imu.pitch, -1.0, 1.0) + pitch_velocity + pitch_disturbance
+        roll_input = k_roll_p * clamp(self.sensor_data.imu.x, -1.0, 1.0) + roll_velocity + roll_disturbance
+        pitch_input = k_pitch_p * clamp(self.sensor_data.imu.y, -1.0, 1.0) + pitch_velocity + pitch_disturbance
         yaw_input = yaw_disturbance
         clamped_difference_altitude = clamp(self.target_altitude - self.sensor_data.altitude + k_vertical_offset, -1.0, 1.0)
         vertical_input = k_vertical_p * (clamped_difference_altitude ** 3)

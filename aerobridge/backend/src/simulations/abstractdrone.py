@@ -3,16 +3,49 @@ from typing import Dict, Any
 from dataclasses import dataclass
 from rpc.controller import ControlInput
 
+from dataclasses import dataclass, field
+from enum import Enum, auto
+import json
+from typing import List
+
 @dataclass
 class ImuData:
-    roll: float = 0
-    pitch: float = 0
-    yaw: float = 0
+    x: float = 0.0
+    y: float = 0.0
+    z: float = 0.0
+
+    def to_json(self):
+        return {
+            "x": self.x,
+            "y": self.y,
+            "z": self.z
+        }
+
+    @classmethod
+    def from_json(cls, data):
+        return cls(
+            x=data["x"],
+            y=data["y"],
+            z=data["z"]
+        )
 
 @dataclass
 class SensorData:
-    imu: ImuData
-    altitude: float = 0
+    imu: ImuData = field(default_factory=ImuData)
+    altitude: float = 0.0
+
+    def to_json(self):
+        return {
+            "imu": self.imu.to_json(),
+            "altitude": self.altitude
+        }
+
+    @classmethod
+    def from_json(cls, data):
+        return cls(
+            imu=ImuData.from_json(data["imu"]),
+            altitude=data["altitude"]
+        )
 
 class AbstractDrone(abc.ABC):
     @abc.abstractmethod

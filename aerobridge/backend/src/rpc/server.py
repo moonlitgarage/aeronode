@@ -12,11 +12,12 @@ class RpcServer:
     def start(self):
         self.drone_thread = threading.Thread(target=self.drone.run)
         self.drone_thread.start()
-        return "Ok"
+        return "STARTED"
 
     def get_sensor_data(self):
         sensor_data = self.drone.get_sensor_data()
-        return sensor_data
+        sensor_data_json = sensor_data.to_json()
+        return sensor_data_json
 
     def handle_control_input(self, ci_json):
         ci = ControlInput.from_json(ci_json)
