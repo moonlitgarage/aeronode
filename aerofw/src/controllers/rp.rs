@@ -1,6 +1,6 @@
 use defmt::unwrap;
 use embassy_executor::Spawner;
-use embassy_rp::{bind_interrupts, gpio::{Level, Output}, i2c::{Blocking, Config, I2c}, peripherals::{I2C0, PIN_13, USB}, usb::{Driver, InterruptHandler}};
+use embassy_rp::{bind_interrupts, gpio::{Level, Output}, i2c::{Blocking, Config, I2c}, peripherals::{I2C0, PIN_25, USB}, usb::{Driver, InterruptHandler}};
 use embassy_usb::{class::cdc_acm::{CdcAcmClass, State}, UsbDevice};
 use static_cell::StaticCell;
 
@@ -11,7 +11,7 @@ use crate::amelia::error::Error;
 // todo: abstract pin assignment out for usage amongst different 
 // boards of the same family
 pub struct RP<'a> {
-    status_led: Output<'a, PIN_13>,
+    status_led: Output<'a, PIN_25>,
     i2c0: I2c<'a, I2C0, Blocking>,
     class: CdcAcmClass<'static, Driver<'static, USB>>,
 }
@@ -31,7 +31,7 @@ impl<'a> RP<'a> {
         let driver = Driver::new(p.USB, Irqs);
 
 
-        let status_led = Output::new(p.PIN_13, Level::Low);
+        let status_led = Output::new(p.PIN_25, Level::Low);
         let i2c0 = embassy_rp::i2c::I2c::new_blocking(
             p.I2C0,
             p.PIN_1, 
