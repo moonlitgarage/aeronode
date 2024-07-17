@@ -4,7 +4,14 @@ Effortlessly bridge the gap between your autopilot and simulation
 ## About
 ## Running
 Two parts
-### Frontend
-Rust
 ### Backend
 Python
+```
+cd backend
+python src/main.py
+```
+### Frontend
+Rust
+```
+cargo run --release
+```
