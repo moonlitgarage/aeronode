@@ -83,7 +83,7 @@ class Webots(AbstractDrone):
         self.ci_queue = queue.Queue()
         self.running = True
 
-        self.sensor_data = SensorData(ImuData(), 0)        
+        self.sensor_data = SensorData(ImuData())        
         self.sensor_data_lock = threading.Lock()
 
     def get_sensor_data(self) -> SensorData:

@@ -3,6 +3,7 @@ from rpc.controller import ControlInput
 from xmlrpc.server import SimpleXMLRPCServer
 from xmlrpc.server import SimpleXMLRPCRequestHandler
 import threading
+import json
 from typing import List
 
 class RpcServer:
@@ -20,7 +21,7 @@ class RpcServer:
         return sensor_data_json
 
     def handle_control_input(self, ci_json):
-        ci = ControlInput.from_json(ci_json)
+        ci = ControlInput.from_json(json.loads(ci_json))
         self.drone.handleControlInput(ci)
         return "HANDLING"
 
