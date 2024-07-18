@@ -1,7 +1,10 @@
 # [AeroNode](https://www.aeronode.io)
+## Making Drone Programming Dead Simple
 
 ## Directory List
-- [aerocore](/aerocore): repo containing schematics for the board
+- [aeroapi](/aeroapi): api for managing the drone
+- [aerobridge](/aerobridge): connecting the board to simulations
+- [aerocore](/aerocore): schematics for the board
 - [aerofw](/aerofw): firmware for aerocore
 - [docs](/docs): contains documentation for using aeronode
-- [www.aeronode.io](/www.aeronode.io): code for the aeronode [website](https://www.aeronode.io/)
+- [websites/aeronode.io](/websites/aeronode.io): code for the aeronode [website](https://www.aeronode.io/)
