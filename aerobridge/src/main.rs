@@ -1,102 +1,80 @@
-mod rpc;
-mod message;
-mod tui;
+use aerobridge::app::{App, AppResult};
+use aerobridge::event::{Event, EventHandler};
+use aerobridge::handler::handle_key_events;
+use aerobridge::rpc;
+use aerobridge::tui::Tui;
+use core::time;
+use std::io;
+use ratatui::backend::CrosstermBackend;
+use ratatui::Terminal;
+use tokio::sync::mpsc;
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::Arc;
 
-use std::{fmt::format, io};
+#[tokio::main]
+async fn main() -> AppResult<()> {
+    let (tx, mut rx) = mpsc::unbounded_channel();
+    let tx2 = tx.clone();
 
-use ratatui::{
-    buffer::Buffer,
-    backend::CrosstermBackend,
-    crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind},
-    layout::{Alignment, Rect},
-    style::Stylize,
-    symbols::border,
-    text::{Line, Text},
-    widgets::{
-        block::{Position, Title},
-        Block, Paragraph, Widget,
-    },
-    Frame,
-};
+    // Create an application.
+    let mut app = App::new();
 
-#[derive(Debug, Default)]
-pub struct App {
-    counter: u8,
-    exit: bool,
-}
+    // Initialize the terminal user interface.
+    let backend = CrosstermBackend::new(io::stderr());
+    let terminal = Terminal::new(backend)?;
+    let events = EventHandler::new(250);
+    let mut tui = Tui::new(terminal, events);
+    tui.init()?;
 
-impl App {
-    pub fn run(&mut self, terminal: &mut tui::Tui) -> io::Result<()> {
-        while !self.exit {
-            terminal.draw(|f| self.render_frame(f))?;
-            self.handle_events()?;
-        }
-        Ok(())
-    }
+    // Create a shared flag to signal the RPC thread to stop
+    let running = Arc::new(AtomicBool::new(true));
+    let running_rpc = running.clone();
 
-    fn render_frame(&mut self, f: &mut Frame) {
-        self.render(f.size(), f.buffer_mut())
-    }
+    // Spawn RPC task in a separate thread
+    let rpc_handle = std::thread::spawn(move || {
+        rpc::run(tx2, running_rpc)
+    });
 
-    fn render(&self, area: Rect, buf: &mut Buffer) {
-        let title = Title::from("Counter".bold());
-        let instructions = Title::from(Line::from(vec![
-            "Dec".into(),
-            "<Left>".blue().bold(),
-        ]));
+    // Start the main loop.
+    'main: loop {
+        // Render the user interface.
+        tui.draw(&mut app)?;
 
-        let block = Block::bordered()
-            .title(title)
-            .title(instructions.alignment(Alignment::Center).position(Position::Bottom))
-            .border_set(border::THICK);
-
-        let counter_text = Text::from(vec![
-            Line::from(vec![
-                "Counter: ".into(),
-                self.counter.to_string().bold().yellow().into(),
-            ])
-        ]);
-
-        Paragraph::new(counter_text).block(block).render(area, buf);
-    }
-
-    fn exit(&mut self) {
-        self.exit = true;
-    }
-
-    fn inc(&mut self) {
-        self.counter += 1;
-    }
-
-    fn dec(&mut self) {
-        self.counter -= 1;
-    }
-
-    fn handle_key_event(&mut self, key_event: KeyEvent) {
-        match key_event.code {
-            KeyCode::Char('q') => self.exit(),
-            KeyCode::Left => self.dec(),
-            KeyCode::Right => self.inc(),
-            _ => {}
-        }
-    }
-
-    fn handle_events(&mut self) -> io::Result<()> {
-        match event::read()? {
-            Event::Key(key_event) if key_event.kind == KeyEventKind::Press => {
-                self.handle_key_event(key_event)
+        // Handle events.
+        tokio::select! {
+            Some(message) = rx.recv() => {
+                app.update_message(message);
             }
-            _ => {}
+            Ok(event) = tui.events.next() => {
+                match event {
+                    Event::Tick => app.tick(),
+                    Event::Key(key_event) => {
+                        if handle_key_events(key_event, &mut app)? {
+                            break 'main;
+                        }
+                    }
+                    Event::Mouse(_) => {}
+                    Event::Resize(_, _) => {}
+                }
+            }
+            else => break,
         }
-        Ok(())
+
+        if !app.running {
+            break;
+        }
     }
-}
 
-fn main() -> io::Result<()> {
-    let mut terminal = tui::init()?;
-    let app_result = App::default().run(&mut terminal);
-    tui::restore()?;
+    // Exit the user interface.
+    tui.exit()?;
 
-    // let _ = rpc::run(); 
-    app_result
+    // Signal shutdown
+    running.store(false, Ordering::SeqCst);
+
+    // Wait for RPC thread to complete
+    if let Err(e) = rpc_handle.join() {
+        eprintln!("RPC thread error: {:?}", e);
+    }
+
+    Ok(())
 }

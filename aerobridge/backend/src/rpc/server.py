@@ -12,16 +12,19 @@ class RpcServer:
 
     def start(self):
         self.drone_thread = threading.Thread(target=self.drone.run)
+        print("Starting drone backend...")
         self.drone_thread.start()
         return "STARTED"
 
     def get_sensor_data(self):
         sensor_data = self.drone.get_sensor_data()
         sensor_data_json = sensor_data.to_json()
+        print("sensor:",sensor_data_json)
         return sensor_data_json
 
     def handle_control_input(self, ci_json):
         ci = ControlInput.from_json(json.loads(ci_json))
+        print("ci:",ci)
         self.drone.handleControlInput(ci)
         return "HANDLING"
 
