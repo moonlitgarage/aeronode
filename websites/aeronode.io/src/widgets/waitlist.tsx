@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { useToast } from "@/components/ui/use-toast"
 
 import {
   Form,
@@ -12,7 +13,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { ENDPOINT_LOOPS } from "@/common/constants";
+import { submitWaitlistForm } from "@/network/loops";
 
 const formSchema = z.object({
   name: z.string().min(1, { message: "Name must be at least 1 character." }),
@@ -20,6 +21,7 @@ const formSchema = z.object({
 })
 
 export function WaitlistForm() {
+  const { toast } = useToast()
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -28,21 +30,21 @@ export function WaitlistForm() {
     },
   })
 
-  function handleSubmit(name: string, email: string) {
-    const userGroup = "2";
-    const formBody = `firstName=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}&userGroup=${encodeURIComponent(userGroup)}`;  
-    fetch(ENDPOINT_LOOPS, {
-      method: "POST",
-      body: formBody,
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-    });
-  }
-  
-
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    handleSubmit(values.name, values.email);
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      await submitWaitlistForm(values.name, values.email);
+      toast({
+        title: "Success!",
+        description: "You've been added to the waitlist.",
+      })
+      form.reset();
+    } catch (error) {
+      toast({
+        title: "Uh oh! Something went wrong.",
+        description: "There was a problem adding you to the waitlist. Please try again.",
+        variant: "destructive",
+      })
+    }
   }
 
   return (
@@ -91,7 +93,7 @@ export default function WaitlistWidget() {
         </CardHeader>
         <CardContent>
           <p className="mb-6 text-center">
-          Join the waitlist for updates and to be the first to know when we launch!          
+            Join the waitlist for updates and to be the first to know when we launch!          
           </p>
           <WaitlistForm />
         </CardContent>
