@@ -86,12 +86,12 @@ export default function WaitlistWidget() {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold">
-            Join Our Waitlist
+            Waitlist
           </CardTitle>
         </CardHeader>
         <CardContent>
           <p className="mb-6 text-center">
-            Be the first to know when we launch. Sign up now!
+          Join the waitlist for updates and to be the first to know when we launch!          
           </p>
           <WaitlistForm />
         </CardContent>
