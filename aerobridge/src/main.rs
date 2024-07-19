@@ -3,7 +3,6 @@ use aerobridge::event::{Event, EventHandler};
 use aerobridge::handler::handle_key_events;
 use aerobridge::rpc;
 use aerobridge::tui::Tui;
-use core::time;
 use std::io;
 use ratatui::backend::CrosstermBackend;
 use ratatui::Terminal;
