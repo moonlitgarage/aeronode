@@ -1,19 +1,21 @@
+use cortex_m::prelude::_embedded_hal_blocking_spi_Transfer;
 use defmt::unwrap;
 use embassy_executor::Spawner;
-use embassy_rp::{bind_interrupts, gpio::{Level, Output}, i2c::{Blocking, Config, I2c}, peripherals::{I2C0, PIN_25, USB}, usb::{Driver, InterruptHandler}};
+use embassy_rp::{bind_interrupts, gpio::{Level, Output}, i2c::{Blocking, Config, I2c}, peripherals::{I2C0, PIN_13, PIN_25, PIN_5, SPI0, USB}, usb::{Driver, InterruptHandler}};
+use embassy_time::Timer;
 use embassy_usb::{class::cdc_acm::{CdcAcmClass, State}, UsbDevice};
 use static_cell::StaticCell;
+use embassy_rp::spi;
 
 use crate::{constants, controllers::controller::{Controller, PinState}};
 use crate::amelia::error::Error;
 
-// pinout used: https://learn.adafruit.com/assets/120082
-// todo: abstract pin assignment out for usage amongst different 
-// boards of the same family
 pub struct RP<'a> {
     status_led: Output<'a, PIN_25>,
     i2c0: I2c<'a, I2C0, Blocking>,
     class: CdcAcmClass<'static, Driver<'static, USB>>,
+    spi: spi::Spi<'static, SPI0, spi::Async>,
+    cs: Output<'a, PIN_5>,
 }
 
 static CONFIG_DESCRIPTOR: StaticCell<[u8; 256]> = StaticCell::new();
@@ -37,6 +39,22 @@ impl<'a> RP<'a> {
             p.PIN_1, 
             p.PIN_0, 
             Config::default(),
+        );
+
+        let miso = p.PIN_4;
+        let mosi = p.PIN_3;
+        let clk  = p.PIN_2;
+        let cs  = Output::new(p.PIN_5, Level::High);
+        let mut config = spi::Config::default();
+        config.frequency = 1_000_000; // 5MHz
+        let spi = spi::Spi::new(
+            p.SPI0, 
+            clk, 
+            mosi, 
+            miso,
+            p.DMA_CH0,
+            p.DMA_CH1,
+            config,
         );
 
         let mut config = embassy_usb::Config::new(0xc0de, 0xcafe);
@@ -75,6 +93,8 @@ impl<'a> RP<'a> {
             status_led,
             i2c0,
             class,
+            spi,
+            cs,
         }
     }
 }
@@ -119,6 +139,15 @@ impl<'a> Controller for RP<'a> {
         let mut usb_buffer = [0_u8; constants::usb::converted::MAX_PACKET_SIZE_USIZE];
         self.class.read_packet(&mut usb_buffer).await?;
         Ok(usb_buffer)
+    }
+
+    async fn spi_read(&mut self, tx_buf: &[u8], rx_buf: &mut[u8]) -> Result<(), Error> {
+        self.cs.set_low();
+        Timer::after_micros(1).await;
+        self.spi.transfer(rx_buf, tx_buf).await.map_err(|_| Error::Io)?;
+        self.cs.set_high();
+    
+        Ok(())
     }
 }
 
