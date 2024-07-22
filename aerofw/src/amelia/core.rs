@@ -33,14 +33,39 @@ pub async fn run(spawner: Spawner) -> Result<(), Error> {
         info!("Running loop");
         let read_buffer = controller.read_from_usb().await?;
 
-        let tx_buf = [0x82_u8, 0];
+
+        // set power control register -------------------------------------
+        let reg_pwr_ctrl = 0x1b_u8;
+        let val_pwr_ctrl = 0b00110011_u8;
+
+        let tx_buf = [reg_pwr_ctrl, val_pwr_ctrl];
         let mut rx_buf = [0_u8; 16];
 
-        info!("SPI write: {:?}", tx_buf);
         controller.spi_read(&tx_buf, &mut rx_buf).await?;
-        info!("SPI read: {:?}", rx_buf);
+        // ----------------------------------------------------------------
+
+        // set chip id register ------------------------------------------
+        let reg_chip_id = 0x80_u8;
+        let val_chip_id = 0x00_u8;
+
+        let tx_buf = [reg_chip_id, val_chip_id];
+        let mut rx_buf = [0_u8;60];
+
+        controller.spi_read(&tx_buf, &mut rx_buf).await?;
+        // ----------------------------------------------------------------
+
+        // set chip id register ------------------------------------------
+        let reg_cal = 0xb1_u8;
+        let val_cal = 0x00_u8;
+
+        let tx_buf = [reg_cal, val_cal];
+        let mut rx_buf2 = [0_u8; 24];
+
+        controller.spi_read(&tx_buf, &mut rx_buf2).await?;
+        // ----------------------------------------------------------------
 
         controller.write_to_usb(zero_pad(&rx_buf)).await?;
+        controller.write_to_usb(zero_pad(&rx_buf2)).await?;
         controller.write_to_usb(read_buffer).await?;
 
         Timer::after_millis(1000).await;
