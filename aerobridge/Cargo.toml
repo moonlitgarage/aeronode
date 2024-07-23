@@ -15,3 +15,5 @@ crossterm = { version = "0.27.0", features = ["event-stream"] }
 futures = "0.3.30"
 tokio = { version = "1.35.1", features = ["full"] }
 aeroapi = {path = "../aeroapi", version = "0.1.0"}
+serialport = "4.4.0"
+postcard = {version = "1.0.8"}

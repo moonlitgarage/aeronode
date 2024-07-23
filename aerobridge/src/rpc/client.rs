@@ -1,41 +1,18 @@
 use std::error::Error;
-use std::thread;
-use std::time::Duration;
-use tokio::sync::mpsc::unbounded_channel;
 use log::{error, info};
 use serde_json;
 use tokio::sync::mpsc::UnboundedSender;
-use tokio::sync::oneshot;
 use xmlrpc::{Request, Value};
 
 
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 
-use crate::message::SensorData;
-use crate::message::ControlInput;
-use crate::message::Channel;
-use crate::message::ChannelId;
-use crate::message::Imu;
+use crate::rpc::message::{self, create_control_input};
+use crate::rpc::errors::RpcError;
+use crate::rpc::hardware::HardwarConnection;
+use crate::rpc::preprogrammed::PreProgrammed;
 
-use std::error::Error as StdError;
-use std::fmt;
-
-#[derive(Debug)]
-pub struct RpcError(String);
-
-impl fmt::Display for RpcError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", self.0)
-    }
-}
-
-impl StdError for RpcError {}
-
-trait AbstractConn: Send {
-    fn send(&mut self, data: &SensorData) -> Result<(), RpcError>;
-    fn read(&mut self) -> Result<ControlInput, RpcError>;
-}
 struct SerialWrapper {
 }
 
@@ -45,117 +22,31 @@ impl SerialWrapper {
     }
 }
 
-impl AbstractConn for SerialWrapper {
-    fn send(&mut self, _data: &SensorData) -> Result<(), RpcError> {
+impl HardwarConnection for SerialWrapper {
+    fn send(&mut self, _data: &message::SensorData) -> Result<(), RpcError> {
         Ok(())
     }
 
-    fn read(&mut self) -> Result<ControlInput, RpcError> {
+    fn read(&mut self) -> Result<message::ControlInput, RpcError> {
         Ok(create_control_input(vec![50, 0, 50, 50], false, false))
     }
 }
 
-
-fn create_control_input(channel_values: Vec<i64>, switch_1: bool, switch_2: bool) -> ControlInput {
-    if channel_values.len() != 4 {
-        panic!("There must be exactly 4 channel values");
-    }
-    
-    let channels = vec![
-        Channel { channel_id: ChannelId::LeftY, channel_val: channel_values[0], min: 0, max: 100 },
-        Channel { channel_id: ChannelId::LeftX, channel_val: channel_values[1], min: 0, max: 100 },
-        Channel { channel_id: ChannelId::RightY, channel_val: channel_values[2], min: 0, max: 100 },
-        Channel { channel_id: ChannelId::RightX, channel_val: channel_values[3], min: 0, max: 100 },
-    ];
-    
-    ControlInput { channels, switch_1, switch_2 }
-}
-
-struct PreProgrammed {
-    current: usize,
-    inputs: Vec<ControlInput>,
-}
-
-impl PreProgrammed {
-    fn new() -> Self {
-        let inputs = vec![
-            // forward
-            create_control_input(vec![50, 50, 100, 50], false, false),
-            create_control_input(vec![50, 50, 100, 50], false, false),
-            create_control_input(vec![50, 50, 100, 50], false, false),
-            create_control_input(vec![50, 50, 100, 50], false, false),
-            create_control_input(vec![50, 50, 100, 50], false, false),
-            create_control_input(vec![50, 50, 100, 50], false, false),
-            create_control_input(vec![50, 50, 100, 50], false, false),
-            create_control_input(vec![50, 50, 100, 50], false, false),
-            create_control_input(vec![50, 50, 100, 50], false, false),
-            create_control_input(vec![50, 50, 100, 50], false, false),
-
-            // yaw right
-            create_control_input(vec![50, 100, 50, 50], false, false),
-            create_control_input(vec![50, 100, 50, 50], false, false),
-            create_control_input(vec![50, 100, 50, 50], false, false),
-            create_control_input(vec![50, 100, 50, 50], false, false),
-            create_control_input(vec![50, 100, 50, 50], false, false),
-
-            // forward
-            create_control_input(vec![50, 50, 100, 50], false, false),
-            create_control_input(vec![50, 50, 100, 50], false, false),
-            create_control_input(vec![50, 50, 100, 50], false, false),
-            create_control_input(vec![50, 50, 100, 50], false, false),
-            create_control_input(vec![50, 50, 100, 50], false, false),
-            create_control_input(vec![50, 50, 100, 50], false, false),
-            create_control_input(vec![50, 50, 100, 50], false, false),
-            create_control_input(vec![50, 50, 100, 50], false, false),
-            create_control_input(vec![50, 50, 100, 50], false, false),
-            create_control_input(vec![50, 50, 100, 50], false, false),
-
-            // yaw left
-            create_control_input(vec![50, 0, 50, 50], false, false),
-            create_control_input(vec![50, 0, 50, 50], false, false),
-            create_control_input(vec![50, 0, 50, 50], false, false),
-            create_control_input(vec![50, 0, 50, 50], false, false),
-            create_control_input(vec![50, 0, 50, 50], false, false),
-
-            // back
-            create_control_input(vec![50, 50, 0, 50], false, false),
-            create_control_input(vec![50, 50, 0, 50], false, false),
-            create_control_input(vec![50, 50, 0, 50], false, false),
-            create_control_input(vec![50, 50, 0, 50], false, false),
-            create_control_input(vec![50, 50, 0, 50], false, false),
-            create_control_input(vec![50, 50, 0, 50], false, false),
-        ];
-        PreProgrammed { current: 0, inputs }
-    }
-}
-
-impl AbstractConn for PreProgrammed {
-    fn send(&mut self, _data: &SensorData) -> Result<(), RpcError> {
-        Ok(())
-    }
-
-    fn read(&mut self) -> Result<ControlInput, RpcError> {
-        let current_input = self.inputs[self.current].clone();
-        self.current = (self.current + 1) % self.inputs.len();
-        Ok(current_input)
-    }
-}
-
 struct Node {
-    conn: Box<dyn AbstractConn + Send>,
+    conn: Box<dyn HardwarConnection + Send>,
 }
 
 impl Node {
     fn new() -> Self {
-        let conn: Box<dyn AbstractConn + Send> = Box::new(PreProgrammed::new());
+        let conn: Box<dyn HardwarConnection + Send> = Box::new(PreProgrammed::new());
         Node { conn }
     }
 
-    fn send_data(&mut self, data: &SensorData) -> Result<(), RpcError> {
+    fn send_data(&mut self, data: &message::SensorData) -> Result<(), RpcError> {
         self.conn.send(data)
     }
 
-    fn receive_control_input(&mut self) -> Result<ControlInput, RpcError> {
+    fn receive_control_input(&mut self) -> Result<message::ControlInput, RpcError> {
         self.conn.read()
     }
 }
@@ -179,7 +70,7 @@ impl AeroBridge {
         }
     }
 
-    fn parse_sensor_data(&self, value: Value) -> Result<SensorData, Box<dyn Error>> {
+    fn parse_sensor_data(&self, value: Value) -> Result<message::SensorData, Box<dyn Error>> {
         match value {
             Value::Struct(map) => {
                 let altitude = map.get("altitude")
@@ -200,9 +91,9 @@ impl AeroBridge {
                     .and_then(|v| v.as_f64())
                     .ok_or("Missing or invalid IMU z value")?;
 
-                Ok(SensorData {
+                Ok(message::SensorData {
                     altitude,
-                    imu: Imu { x, y, z },
+                    imu: message::Imu { x, y, z },
                 })
             },
             _ => Err("Invalid sensor data format".into()),

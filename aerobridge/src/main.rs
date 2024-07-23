@@ -10,8 +10,6 @@ use tokio::sync::mpsc;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 
-
-
 #[tokio::main]
 async fn main() -> AppResult<()> {
     let (tx, mut rx) = mpsc::unbounded_channel();
@@ -33,7 +31,7 @@ async fn main() -> AppResult<()> {
 
     // Spawn RPC task in a separate thread
     let rpc_handle = std::thread::spawn(move || {
-        rpc::run(tx2, running_rpc)
+        rpc::client::run(tx2, running_rpc)
     });
 
     // Start the main loop.

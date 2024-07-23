@@ -35,3 +35,18 @@ pub struct Imu {
     pub y: f64,
     pub z: f64,
 }
+
+pub fn create_control_input(channel_values: Vec<i64>, switch_1: bool, switch_2: bool) -> ControlInput {
+    if channel_values.len() != 4 {
+        panic!("There must be exactly 4 channel values");
+    }
+    
+    let channels = vec![
+        Channel { channel_id: ChannelId::LeftY, channel_val: channel_values[0], min: 0, max: 100 },
+        Channel { channel_id: ChannelId::LeftX, channel_val: channel_values[1], min: 0, max: 100 },
+        Channel { channel_id: ChannelId::RightY, channel_val: channel_values[2], min: 0, max: 100 },
+        Channel { channel_id: ChannelId::RightX, channel_val: channel_values[3], min: 0, max: 100 },
+    ];
+    
+    ControlInput { channels, switch_1, switch_2 }
+}

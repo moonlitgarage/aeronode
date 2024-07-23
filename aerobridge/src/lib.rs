@@ -15,6 +15,3 @@ pub mod handler;
 
 /// RPC client.
 pub mod rpc;
-
-/// message format.
-pub mod message;
