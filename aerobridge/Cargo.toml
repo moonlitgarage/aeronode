@@ -14,3 +14,4 @@ color-eyre = "0.6.3"
 crossterm = { version = "0.27.0", features = ["event-stream"] }
 futures = "0.3.30"
 tokio = { version = "1.35.1", features = ["full"] }
+aeroapi = {path = "../aeroapi", version = "0.1.0"}

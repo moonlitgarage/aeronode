@@ -21,3 +21,5 @@ cortex-m-rt = "0.7.3"
 panic-probe = "0.3.1"
 static_cell = "=2.0.0"
 portable-atomic = { version = "1.5", features = ["critical-section"] }
+aeroapi = {path = "../aeroapi", version = "0.1.0"}
+postcard = {version = "1.0.8"}

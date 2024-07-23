@@ -8,13 +8,13 @@ use static_cell::StaticCell;
 use embassy_rp::spi;
 
 use crate::{constants, controllers::controller::{Controller, PinState}};
-use crate::amelia::error::Error;
+use crate::pilot::error::Error;
 
 pub struct RP<'a> {
     status_led: Output<'a, PIN_25>,
     i2c0: I2c<'a, I2C0, Blocking>,
     class: CdcAcmClass<'static, Driver<'static, USB>>,
-    spi: spi::Spi<'static, SPI0, spi::Async>,
+    spi: spi::Spi<'a, SPI0, spi::Async>,
     cs: Output<'a, PIN_5>,
 }
 
@@ -124,10 +124,6 @@ impl<'a> Controller for RP<'a> {
                 self.status_led.set_low();
             }
         }
-    }
-
-    fn write_to_i2c(&mut self, addr: u8, data: &[u8]) -> Result<(), Error> {
-        self.i2c0.blocking_write(addr, data).map_err(|_| (Error::Io))
     }
 
     async fn write_to_usb(&mut self, data: [u8; constants::usb::converted::MAX_PACKET_SIZE_USIZE]) -> Result<(), Error> {

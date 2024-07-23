@@ -9,3 +9,5 @@ repository = "https://github.com/koerolabs/aeronode/aeroapi"
 readme = "readme.md"
 
 [dependencies]
+serde = { version = "1.0", default-features = false, features = ["derive"] }
+postcard = {version = "1.0.8"}
