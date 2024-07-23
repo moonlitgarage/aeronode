@@ -8,29 +8,10 @@ use xmlrpc::{Request, Value};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 
-use crate::rpc::message::{self, create_control_input};
+use crate::rpc::message;
 use crate::rpc::errors::RpcError;
 use crate::rpc::hardware::HardwarConnection;
 use crate::rpc::preprogrammed::PreProgrammed;
-
-struct SerialWrapper {
-}
-
-impl SerialWrapper {
-    fn new() -> Result<Self, Box<dyn Error>> {
-        Ok(SerialWrapper {})
-    }
-}
-
-impl HardwarConnection for SerialWrapper {
-    fn send(&mut self, _data: &message::SensorData) -> Result<(), RpcError> {
-        Ok(())
-    }
-
-    fn read(&mut self) -> Result<message::ControlInput, RpcError> {
-        Ok(create_control_input(vec![50, 0, 50, 50], false, false))
-    }
-}
 
 struct Node {
     conn: Box<dyn HardwarConnection + Send>,
@@ -42,11 +23,11 @@ impl Node {
         Node { conn }
     }
 
-    fn send_data(&mut self, data: &message::SensorData) -> Result<(), RpcError> {
+    fn send_data(&mut self, data: &aeroapi::data::sensors::Sensors) -> Result<(), RpcError> {
         self.conn.send(data)
     }
 
-    fn receive_control_input(&mut self) -> Result<message::ControlInput, RpcError> {
+    fn receive_control_input(&mut self) -> Result<aeroapi::data::commands::Controller, RpcError> {
         self.conn.read()
     }
 }
@@ -56,11 +37,11 @@ struct AeroBridge {
     server_url: String,
     running: bool,
     connected: bool,
-    tx: UnboundedSender<String>,
+    tx: UnboundedSender<aeroapi::data::commands::Controller>,
 }
 
 impl AeroBridge {
-    fn new(server_url: String, tx: UnboundedSender<String>) -> Self {
+    fn new(server_url: String, tx: UnboundedSender<aeroapi::data::commands::Controller>) -> Self {
         AeroBridge {
             node: Node::new(),
             server_url,
@@ -70,7 +51,7 @@ impl AeroBridge {
         }
     }
 
-    fn parse_sensor_data(&self, value: Value) -> Result<message::SensorData, Box<dyn Error>> {
+    fn parse_sensor_data(&self, value: Value) -> Result<aeroapi::data::sensors::Sensors, Box<dyn Error>> {
         match value {
             Value::Struct(map) => {
                 let altitude = map.get("altitude")
@@ -91,10 +72,14 @@ impl AeroBridge {
                     .and_then(|v| v.as_f64())
                     .ok_or("Missing or invalid IMU z value")?;
 
-                Ok(message::SensorData {
-                    altitude,
-                    imu: message::Imu { x, y, z },
-                })
+                let sensor_data = aeroapi::data::sensors::Sensors::new(
+                    Some(altitude as f32),
+                    Some(aeroapi::data::commons::Vec3d{x: x as f32, y: y as f32, z: z as f32}),
+                    None,
+                    None,
+                );
+                    
+                Ok(sensor_data)
             },
             _ => Err("Invalid sensor data format".into()),
         }
@@ -131,8 +116,8 @@ impl AeroBridge {
             self.node.send_data(&sensor_data)?;
             
             let ci = self.node.receive_control_input()?;
-            let ci_json = serde_json::to_string(&ci).map_err(|e| RpcError("Failed to start".to_string())).map_err(|e| RpcError("Failed to start".to_string()))?;
-            self.tx.send(ci_json.clone()).map_err(|e| RpcError("Failed to start".to_string()))?;
+            self.tx.send(ci.clone()).map_err(|e| RpcError("Failed to start".to_string()))?;
+            let ci_json = serde_json::to_string(&message::ControlInput::from(ci)).map_err(|e| RpcError("Failed to start".to_string()))?;
             
             let handle_control_input_request = Request::new("handle_control_input").arg(ci_json);
             handle_control_input_request.call_url(&self.server_url).map_err(|e| RpcError("Failed to start".to_string())).map_err(|e| RpcError("Failed to start".to_string()))?;
@@ -145,7 +130,7 @@ impl AeroBridge {
 }
 
 
-pub fn run(tx: UnboundedSender<String>, running: Arc<AtomicBool>) -> Result<(), RpcError> {
+pub fn run(tx: UnboundedSender<aeroapi::data::commands::Controller>, running: Arc<AtomicBool>) -> Result<(), RpcError> {
     let mut aero_bridge = AeroBridge::new("http://localhost:8000/RPC2".to_string(), tx);
 
     aero_bridge.connect();
@@ -167,9 +152,9 @@ pub fn run(tx: UnboundedSender<String>, running: Arc<AtomicBool>) -> Result<(), 
         aero_bridge.node.send_data(&sensor_data)?;
         
         let ci = aero_bridge.node.receive_control_input()?;
-        let ci_json = serde_json::to_string(&ci)
+        let ci_json = serde_json::to_string(&message::ControlInput::from(ci))
             .map_err(|e| RpcError("Failed to serialize control input".to_string()))?;
-        aero_bridge.tx.send(ci_json.clone())
+        aero_bridge.tx.send(ci.clone())
             .map_err(|e| RpcError("Failed to send control input".to_string()))?;
         
         let handle_control_input_request = Request::new("handle_control_input").arg(ci_json);

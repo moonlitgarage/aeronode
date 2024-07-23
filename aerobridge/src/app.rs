@@ -50,7 +50,7 @@ impl App {
         }
     }
 
-    pub fn update_message(&mut self, message: String) {
-        self.message = message;
+    pub fn update_message(&mut self, controller: aeroapi::data::commands::Controller) {
+        self.message = format!("{:?}", controller);
     }
 }

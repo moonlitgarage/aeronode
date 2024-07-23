@@ -3,3 +3,4 @@ mod message;
 mod preprogrammed;
 mod hardware;
 pub mod errors;
+mod serial;

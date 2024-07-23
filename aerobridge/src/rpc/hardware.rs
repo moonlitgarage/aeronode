@@ -2,6 +2,6 @@ use crate::rpc::message;
 use crate::rpc::errors::RpcError;
 
 pub trait HardwarConnection: Send {
-    fn send(&mut self, data: &message::SensorData) -> Result<(), RpcError>;
-    fn read(&mut self) -> Result<message::ControlInput, RpcError>;
+    fn send(&mut self, data: &aeroapi::data::sensors::Sensors) -> Result<(), RpcError>;
+    fn read(&mut self) -> Result<aeroapi::data::commands::Controller, RpcError>;
 }

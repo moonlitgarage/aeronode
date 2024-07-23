@@ -4,7 +4,7 @@ use crate::rpc::hardware::HardwarConnection;
 
 pub struct PreProgrammed {
     current: usize,
-    inputs: Vec<message::ControlInput>,
+    inputs: Vec<aeroapi::data::commands::Controller>,
 }
 
 impl PreProgrammed {
@@ -61,11 +61,11 @@ impl PreProgrammed {
 }
 
 impl HardwarConnection for PreProgrammed {
-    fn send(&mut self, _data: &message::SensorData) -> Result<(), RpcError> {
+    fn send(&mut self, _data: &aeroapi::data::sensors::Sensors) -> Result<(), RpcError> {
         Ok(())
     }
 
-    fn read(&mut self) -> Result<message::ControlInput, RpcError> {
+    fn read(&mut self) -> Result<aeroapi::data::commands::Controller, RpcError> {
         let current_input = self.inputs[self.current].clone();
         self.current = (self.current + 1) % self.inputs.len();
         Ok(current_input)
