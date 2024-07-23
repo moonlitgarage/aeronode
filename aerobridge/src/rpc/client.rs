@@ -12,14 +12,24 @@ use crate::rpc::message;
 use crate::rpc::errors::RpcError;
 use crate::rpc::hardware::HardwarConnection;
 use crate::rpc::preprogrammed::PreProgrammed;
+use crate::rpc::serial::SerialWrapper;
 
 struct Node {
     conn: Box<dyn HardwarConnection + Send>,
 }
 
+pub enum NodeConnection {
+    Serial,
+    PreProgrammed
+}
+
 impl Node {
-    fn new() -> Self {
-        let conn: Box<dyn HardwarConnection + Send> = Box::new(PreProgrammed::new());
+    fn new(mode: NodeConnection) -> Self {
+        let conn: Box<dyn HardwarConnection + Send> = match mode {
+            NodeConnection::Serial => Box::new(SerialWrapper::new().unwrap()),
+            NodeConnection::PreProgrammed => Box::new(PreProgrammed::new()),
+            
+        };
         Node { conn }
     }
 
@@ -41,9 +51,9 @@ struct AeroBridge {
 }
 
 impl AeroBridge {
-    fn new(server_url: String, tx: UnboundedSender<aeroapi::data::commands::Controller>) -> Self {
+    fn new(mode: NodeConnection, server_url: String, tx: UnboundedSender<aeroapi::data::commands::Controller>) -> Self {
         AeroBridge {
-            node: Node::new(),
+            node: Node::new(mode),
             server_url,
             running: false,
             connected: false,
@@ -130,8 +140,8 @@ impl AeroBridge {
 }
 
 
-pub fn run(tx: UnboundedSender<aeroapi::data::commands::Controller>, running: Arc<AtomicBool>) -> Result<(), RpcError> {
-    let mut aero_bridge = AeroBridge::new("http://localhost:8000/RPC2".to_string(), tx);
+pub fn run(mode: NodeConnection, tx: UnboundedSender<aeroapi::data::commands::Controller>, running: Arc<AtomicBool>) -> Result<(), RpcError> {
+    let mut aero_bridge = AeroBridge::new(mode, "http://localhost:8000/RPC2".to_string(), tx);
 
     aero_bridge.connect();
 

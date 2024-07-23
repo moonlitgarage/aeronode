@@ -2,6 +2,7 @@ use aerobridge::app::{App, AppResult};
 use aerobridge::event::{Event, EventHandler};
 use aerobridge::handler::handle_key_events;
 use aerobridge::rpc;
+use aerobridge::rpc::client::NodeConnection;
 use aerobridge::tui::Tui;
 use std::io;
 use ratatui::backend::CrosstermBackend;
@@ -31,7 +32,7 @@ async fn main() -> AppResult<()> {
 
     // Spawn RPC task in a separate thread
     let rpc_handle = std::thread::spawn(move || {
-        rpc::client::run(tx2, running_rpc)
+        rpc::client::run(NodeConnection::PreProgrammed, tx2, running_rpc)
     });
 
     // Start the main loop.
