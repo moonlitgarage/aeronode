@@ -1,4 +1,3 @@
-use aeroapi::data::commands::Switches;
 use serde::{Serialize, Deserialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -50,16 +49,16 @@ pub struct Imu {
     pub z: f64,
 }
 
-impl SensorData {
-    pub fn to_aeroapi_sensor(&self) -> aeroapi::data::sensors::Sensors {
-        aeroapi::data::sensors::Sensors::new(
-            Some(self.altitude as f32),
-            Some(aeroapi::data::commons::Vec3d{x: self.imu.x as f32, y: self.imu.y as f32, z: self.imu.z as f32}),
-            None,
-            None,
-        )
-    }
-}
+// impl SensorData {
+//     pub fn to_aeroapi_sensor(&self) -> aeroapi::data::sensors::Sensors {
+//         aeroapi::data::sensors::Sensors::new(
+//             Some(self.altitude as f32),
+//             Some(aeroapi::data::commons::Vec3d{x: self.imu.x as f32, y: self.imu.y as f32, z: self.imu.z as f32}),
+//             None,
+//             None,
+//         )
+//     }
+// }
 
 pub fn create_control_input(channel_values: Vec<i64>, switch_1: bool, switch_2: bool) -> aeroapi::data::commands::Controller {
     if channel_values.len() != 4 {

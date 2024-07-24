@@ -1,5 +1,7 @@
 use std::error;
 
+use crate::rpc::client::{DataType, SimData};
+
 /// Application result type.
 pub type AppResult<T> = std::result::Result<T, Box<dyn error::Error>>;
 
@@ -11,7 +13,8 @@ pub struct App {
     /// counter
     pub counter: u8,
 
-    pub message: String,
+    pub controller: aeroapi::data::commands::Controller,
+    pub sensors: aeroapi::data::sensors::Sensors,
 }
 
 impl Default for App {
@@ -19,7 +22,19 @@ impl Default for App {
         Self {
             running: true,
             counter: 0,
-            message: String::from("Nothing up yet!"), 
+            controller: aeroapi::data::commands::Controller {
+                channels: aeroapi::data::commands::Channels {
+                    throttle: 0u8,
+                    yaw: 0u8,
+                    pitch: 0u8,
+                    roll: 0u8,
+                },
+                switches: aeroapi::data::commands::Switches {
+                    arm: false,
+                    autopilot: false,
+                },
+            },
+            sensors: aeroapi::data::sensors::Sensors::new(None, None, None, None)
         }
     }
 }
@@ -50,7 +65,14 @@ impl App {
         }
     }
 
-    pub fn update_message(&mut self, controller: aeroapi::data::commands::Controller) {
-        self.message = format!("{:?}", controller);
+    pub fn update_message(&mut self, simdata: SimData) {
+        match simdata.data_type {
+            DataType::ControlInput => {
+                self.controller = simdata.control_input.unwrap();
+            },
+            DataType::SensorData => {
+                self.sensors = simdata.sensor_data.unwrap();
+            },
+        }
     }
 }

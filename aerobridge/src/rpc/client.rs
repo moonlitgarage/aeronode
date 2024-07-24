@@ -10,12 +10,12 @@ use std::sync::Arc;
 
 use crate::rpc::message;
 use crate::rpc::errors::RpcError;
-use crate::rpc::hardware::HardwarConnection;
+use crate::rpc::hardware::HardwareConnection;
 use crate::rpc::preprogrammed::PreProgrammed;
 use crate::rpc::serial::SerialWrapper;
 
 struct Node {
-    conn: Box<dyn HardwarConnection + Send>,
+    conn: Box<dyn HardwareConnection + Send>,
 }
 
 pub enum NodeConnection {
@@ -25,7 +25,7 @@ pub enum NodeConnection {
 
 impl Node {
     fn new(mode: NodeConnection) -> Self {
-        let conn: Box<dyn HardwarConnection + Send> = match mode {
+        let conn: Box<dyn HardwareConnection + Send> = match mode {
             NodeConnection::Serial => Box::new(SerialWrapper::new().unwrap()),
             NodeConnection::PreProgrammed => Box::new(PreProgrammed::new()),
             
@@ -47,11 +47,11 @@ struct AeroBridge {
     server_url: String,
     running: bool,
     connected: bool,
-    tx: UnboundedSender<aeroapi::data::commands::Controller>,
+    tx: UnboundedSender<SimData>,
 }
 
 impl AeroBridge {
-    fn new(mode: NodeConnection, server_url: String, tx: UnboundedSender<aeroapi::data::commands::Controller>) -> Self {
+    fn new(mode: NodeConnection, server_url: String, tx: UnboundedSender<SimData>) -> Self {
         AeroBridge {
             node: Node::new(mode),
             server_url,
@@ -109,46 +109,61 @@ impl AeroBridge {
         }
     }
 
-    async fn run(&mut self) -> Result<(), RpcError> {
-        self.running = true;
-        self.connect();
+    // async fn run(&mut self) -> Result<(), RpcError> {
+    //     self.running = true;
+    //     self.connect();
     
-        let start_request = Request::new("start");
-        let start_result = start_request.call_url(&self.server_url).map_err(|e| RpcError("Failed to start".to_string()))?;
-        println!("Start result: {:?}", start_result);
+    //     let start_request = Request::new("start");
+    //     let start_result = start_request.call_url(&self.server_url).map_err(|e| RpcError(e.to_string()))?;
     
-        while self.running {
-            let get_sensor_data_request = Request::new("get_sensor_data");
-            let sensor_data_value = get_sensor_data_request.call_url(&self.server_url).map_err(|e| RpcError("Failed to start".to_string()))?;
+    //     while self.running {
+    //         let get_sensor_data_request = Request::new("get_sensor_data");
+    //         let sensor_data_value = get_sensor_data_request.call_url(&self.server_url).map_err(|e| RpcError("Failed to start".to_string()))?;
 
-            let sensor_data = self.parse_sensor_data(sensor_data_value).map_err(|e| RpcError("Failed to start".to_string()))?;
+    //         let sensor_data = self.parse_sensor_data(sensor_data_value).map_err(|e| RpcError("Failed to start".to_string()))?;
                         
-            self.node.send_data(&sensor_data)?;
+    //         self.node.send_data(&sensor_data)?;
             
-            let ci = self.node.receive_control_input()?;
-            self.tx.send(ci.clone()).map_err(|e| RpcError("Failed to start".to_string()))?;
-            let ci_json = serde_json::to_string(&message::ControlInput::from(ci)).map_err(|e| RpcError("Failed to start".to_string()))?;
+    //         let ci = self.node.receive_control_input()?;
+
+    //         let sim_data = SimData {
+    //             data_type: DataType::ControlInput,
+    //             sensor_data: None,
+    //             control_input: Some(ci.clone()),
+    //         };
+
+    //         self.tx.send(sim_data).map_err(|e| RpcError("Failed to start".to_string()))?;
+    //         let ci_json = serde_json::to_string(&message::ControlInput::from(ci)).map_err(|e| RpcError("Failed to start".to_string()))?;
             
-            let handle_control_input_request = Request::new("handle_control_input").arg(ci_json);
-            handle_control_input_request.call_url(&self.server_url).map_err(|e| RpcError("Failed to start".to_string())).map_err(|e| RpcError("Failed to start".to_string()))?;
+    //         let handle_control_input_request = Request::new("handle_control_input").arg(ci_json);
+    //         handle_control_input_request.call_url(&self.server_url).map_err(|e| RpcError("Failed to start".to_string())).map_err(|e| RpcError("Failed to start".to_string()))?;
             
-            // tokio::time::sleep(Duration::from_millis(500)).await;
-        }
+    //         // tokio::time::sleep(Duration::from_millis(500)).await;
+    //     }
     
-        Ok(())
-    }
+    //     Ok(())
+    // }
 }
 
+pub enum DataType {
+    SensorData,
+    ControlInput,
+}
 
-pub fn run(mode: NodeConnection, tx: UnboundedSender<aeroapi::data::commands::Controller>, running: Arc<AtomicBool>) -> Result<(), RpcError> {
+pub struct SimData {
+    pub data_type: DataType,
+    pub sensor_data: Option<aeroapi::data::sensors::Sensors>,
+    pub control_input: Option<aeroapi::data::commands::Controller>,
+}
+
+pub fn run(mode: NodeConnection, tx: UnboundedSender<SimData>, running: Arc<AtomicBool>) -> Result<(), RpcError> {
     let mut aero_bridge = AeroBridge::new(mode, "http://localhost:8000/RPC2".to_string(), tx);
 
     aero_bridge.connect();
 
         
     let start_request = Request::new("start");
-    let start_result = start_request.call_url(&aero_bridge.server_url).map_err(|e| RpcError("Failed to start".to_string()))?;
-    println!("Start result: {:?}", start_result);
+    let _ = start_request.call_url(&aero_bridge.server_url).map_err(|e| RpcError("Failed to start".to_string()))?;
 
     
     while running.load(Ordering::SeqCst) {
@@ -158,13 +173,27 @@ pub fn run(mode: NodeConnection, tx: UnboundedSender<aeroapi::data::commands::Co
 
         let sensor_data = aero_bridge.parse_sensor_data(sensor_data_value)
             .map_err(|e| RpcError("Failed to parse sensor data".to_string()))?;
+
+        let sim_data = SimData {
+            data_type: DataType::SensorData,
+            sensor_data: Some(sensor_data.clone()),
+            control_input: None,
+        };
                     
-        aero_bridge.node.send_data(&sensor_data)?;
-        
+        aero_bridge.tx.send(sim_data)
+            .map_err(|e| RpcError("Failed to send control input".to_string()))?;   
+
         let ci = aero_bridge.node.receive_control_input()?;
         let ci_json = serde_json::to_string(&message::ControlInput::from(ci))
             .map_err(|e| RpcError("Failed to serialize control input".to_string()))?;
-        aero_bridge.tx.send(ci.clone())
+
+        let sim_data = SimData {
+            data_type: DataType::ControlInput,
+            sensor_data: None,
+            control_input: Some(ci.clone()),
+        };
+
+        aero_bridge.tx.send(sim_data)
             .map_err(|e| RpcError("Failed to send control input".to_string()))?;
         
         let handle_control_input_request = Request::new("handle_control_input").arg(ci_json);

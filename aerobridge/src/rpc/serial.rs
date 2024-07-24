@@ -2,9 +2,8 @@ use std::{error::Error, io::{self, Write}, time::Duration};
 
 use serialport::SerialPort;
 
-use super::{errors::RpcError, hardware::HardwarConnection, message::{self, create_control_input}};
-
-
+use crate::rpc::errors::RpcError;
+use crate::rpc::hardware::HardwareConnection;
 
 pub struct SerialWrapper {
     port: Box<dyn SerialPort>,
@@ -25,7 +24,7 @@ impl SerialWrapper {
     }
 }
 
-impl HardwarConnection for SerialWrapper {
+impl HardwareConnection for SerialWrapper {
     fn send(&mut self, _data: &aeroapi::data::sensors::Sensors) -> Result<(), RpcError> {
 
         let message = "Hello, Pico!\n";
@@ -42,22 +41,22 @@ impl HardwarConnection for SerialWrapper {
                 println!("No data received");
             }
             Ok(t) => {
-                println!("Received: {:?}", serial_buf);
+                println!("Received: {:?}. {:?}", serial_buf, t);
                 io::stdout().flush().map_err(|e| RpcError(e.to_string()))?;
-                let chipid = &serial_buf[2];
-                let recid = &serial_buf[3];
+                // let chipid = &serial_buf[2];
+                // let recid = &serial_buf[3];
 
-                let err_reg = &serial_buf[4];
-                let status_reg = &serial_buf[5];
+                // let err_reg = &serial_buf[4];
+                // let status_reg = &serial_buf[5];
 
                 
-                let data0 = &serial_buf[6];
-                let data1 = &serial_buf[7];
-                let data2 = &serial_buf[8];
+                // let data0 = &serial_buf[6];
+                // let data1 = &serial_buf[7];
+                // let data2 = &serial_buf[8];
 
-                let data3 = &serial_buf[9];
-                let data4 = &serial_buf[10];
-                let data5 = &serial_buf[11];
+                // let data3 = &serial_buf[9];
+                // let data4 = &serial_buf[10];
+                // let data5 = &serial_buf[11];
 
                 let alt = postcard::from_bytes::<aeroapi::data::commands::Controller>(&serial_buf).unwrap();
 

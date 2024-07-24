@@ -1,6 +1,6 @@
-use crate::rpc::message::{self, create_control_input};
+use crate::rpc::message::create_control_input;
 use crate::rpc::errors::RpcError;
-use crate::rpc::hardware::HardwarConnection;
+use crate::rpc::hardware::HardwareConnection;
 
 pub struct PreProgrammed {
     current: usize,
@@ -60,7 +60,7 @@ impl PreProgrammed {
     }
 }
 
-impl HardwarConnection for PreProgrammed {
+impl HardwareConnection for PreProgrammed {
     fn send(&mut self, _data: &aeroapi::data::sensors::Sensors) -> Result<(), RpcError> {
         Ok(())
     }
