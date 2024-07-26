@@ -1,3 +1,5 @@
+use aeroapi::data::commands::Controller;
+
 use crate::rpc::message::create_control_input;
 use crate::rpc::errors::RpcError;
 use crate::rpc::hardware::HardwareConnection;
@@ -7,9 +9,8 @@ pub struct PreProgrammed {
     inputs: Vec<aeroapi::data::commands::Controller>,
 }
 
-impl PreProgrammed {
-    pub fn new() -> Self {
-        let inputs = vec![
+fn inputs_1() -> Vec<Controller> {
+    vec![
             // forward
             // Takeoff and hover
             create_control_input(vec![55, 50, 50, 50], false, false),
@@ -197,7 +198,153 @@ impl PreProgrammed {
             create_control_input(vec![60, 50, 50, 50], false, false),
             create_control_input(vec![55, 50, 50, 50], false, false),
             create_control_input(vec![50, 50, 50, 50], false, false),
-        ];
+        ]
+}
+
+
+fn shikanoko() -> Vec<Controller> {
+    vec![
+        create_control_input(vec![50, 50, 50, 50], false, false),
+        create_control_input(vec![50, 50, 50, 50], false, false),
+        create_control_input(vec![50, 50, 50, 50], false, false),
+        create_control_input(vec![50, 50, 50, 50], false, false),
+        create_control_input(vec![50, 50, 50, 50], false, false),
+        create_control_input(vec![50, 50, 50, 50], false, false),
+        create_control_input(vec![50, 50, 50, 50], false, false),
+        create_control_input(vec![50, 50, 50, 50], false, false),
+        create_control_input(vec![50, 50, 50, 50], false, false),
+        create_control_input(vec![50, 50, 50, 50], false, false),
+        create_control_input(vec![50, 50, 50, 50], false, false),
+        create_control_input(vec![50, 50, 50, 50], false, false),
+        create_control_input(vec![50, 50, 50, 50], false, false),
+        create_control_input(vec![50, 50, 50, 50], false, false),
+        create_control_input(vec![50, 50, 50, 50], false, false),
+        create_control_input(vec![50, 50, 50, 50], false, false),
+        create_control_input(vec![50, 50, 50, 50], false, false),
+        create_control_input(vec![50, 50, 50, 50], false, false),
+        create_control_input(vec![50, 50, 50, 50], false, false),
+        create_control_input(vec![50, 50, 50, 50], false, false),
+        create_control_input(vec![50, 50, 50, 50], false, false),
+        create_control_input(vec![50, 50, 50, 50], false, false),
+        create_control_input(vec![50, 50, 50, 50], false, false),
+        create_control_input(vec![50, 50, 50, 50], false, false),
+
+        create_control_input(vec![50, 50, 50, 50], false, false),
+        create_control_input(vec![50, 50, 50, 50], false, false),
+        create_control_input(vec![50, 50, 50, 50], false, false),
+        create_control_input(vec![50, 50, 50, 50], false, false),
+        create_control_input(vec![50, 50, 50, 50], false, false),
+        create_control_input(vec![50, 50, 50, 50], false, false),
+        create_control_input(vec![50, 50, 50, 50], false, false),
+
+
+        create_control_input(vec![50, 50, 50, 25], false, false),
+        create_control_input(vec![50, 50, 50, 0], false, false),
+        create_control_input(vec![50, 50, 50, 0], false, false),
+        create_control_input(vec![50, 50, 50, 25], false, false),
+        create_control_input(vec![50, 50, 50, 50], false, false),
+        create_control_input(vec![50, 50, 50, 50], false, false),
+
+        create_control_input(vec![50, 50, 50, 75], false, false),
+        create_control_input(vec![50, 50, 50, 100], false, false),
+        create_control_input(vec![50, 50, 50, 100], false, false),
+        create_control_input(vec![50, 50, 50, 75], false, false),
+        create_control_input(vec![50, 50, 50, 50], false, false),
+        create_control_input(vec![50, 50, 50, 50], false, false),
+
+        create_control_input(vec![50, 50, 50, 25], false, false),
+        create_control_input(vec![50, 50, 50, 0], false, false),
+        create_control_input(vec![50, 50, 50, 0], false, false),
+        create_control_input(vec![50, 50, 50, 25], false, false),
+        create_control_input(vec![50, 50, 50, 50], false, false),
+        create_control_input(vec![50, 50, 50, 50], false, false),
+
+        create_control_input(vec![50, 50, 50, 75], false, false),
+        create_control_input(vec![50, 50, 50, 100], false, false),
+        create_control_input(vec![50, 50, 50, 100], false, false),
+        create_control_input(vec![50, 50, 50, 75], false, false),
+        create_control_input(vec![50, 50, 50, 50], false, false),
+        create_control_input(vec![50, 50, 50, 50], false, false),
+
+        create_control_input(vec![50, 50, 50, 25], false, false),
+        create_control_input(vec![50, 50, 50, 0], false, false),
+        create_control_input(vec![50, 50, 50, 0], false, false),
+        create_control_input(vec![50, 50, 50, 25], false, false),
+        create_control_input(vec![50, 50, 50, 50], false, false),
+        create_control_input(vec![50, 50, 50, 50], false, false),
+
+        create_control_input(vec![50, 50, 50, 75], false, false),
+        create_control_input(vec![50, 50, 50, 100], false, false),
+        create_control_input(vec![50, 50, 50, 100], false, false),
+        create_control_input(vec![50, 50, 50, 75], false, false),
+        create_control_input(vec![50, 50, 50, 50], false, false),
+        create_control_input(vec![50, 50, 50, 50], false, false),
+
+
+
+        create_control_input(vec![50, 50, 50, 50], false, false),
+        create_control_input(vec![50, 50, 50, 50], false, false),
+
+        create_control_input(vec![50, 50, 100, 50], false, false),
+        create_control_input(vec![50, 50, 100, 50], false, false),
+        create_control_input(vec![50, 50, 100, 50], false, false),
+        create_control_input(vec![50, 50, 100, 50], false, false),
+
+        create_control_input(vec![50, 50, 0, 50], false, false),
+        create_control_input(vec![50, 50, 0, 50], false, false),
+        create_control_input(vec![50, 50, 0, 50], false, false),
+        create_control_input(vec![50, 50, 0, 50], false, false),
+        create_control_input(vec![50, 50, 50, 50], false, false),
+        create_control_input(vec![50, 50, 50, 50], false, false),
+
+        create_control_input(vec![50, 50, 100, 50], false, false),
+        create_control_input(vec![50, 50, 100, 50], false, false),
+        create_control_input(vec![50, 50, 100, 50], false, false),
+        create_control_input(vec![50, 50, 100, 50], false, false),
+
+        create_control_input(vec![50, 50, 0, 50], false, false),
+        create_control_input(vec![50, 50, 0, 50], false, false),
+        create_control_input(vec![50, 50, 0, 50], false, false),
+        create_control_input(vec![50, 50, 0, 50], false, false),        create_control_input(vec![50, 50, 50, 50], false, false),
+        create_control_input(vec![50, 50, 50, 50], false, false),
+
+        create_control_input(vec![50, 50, 100, 50], false, false),
+        create_control_input(vec![50, 50, 100, 50], false, false),
+        create_control_input(vec![50, 50, 100, 50], false, false),
+        create_control_input(vec![50, 50, 100, 50], false, false),
+
+        create_control_input(vec![50, 50, 0, 50], false, false),
+        create_control_input(vec![50, 50, 0, 50], false, false),
+        create_control_input(vec![50, 50, 0, 50], false, false),
+        create_control_input(vec![50, 50, 0, 50], false, false),        create_control_input(vec![50, 50, 50, 50], false, false),
+        create_control_input(vec![50, 50, 50, 50], false, false),
+
+        create_control_input(vec![50, 50, 100, 50], false, false),
+        create_control_input(vec![50, 50, 100, 50], false, false),
+        create_control_input(vec![50, 50, 100, 50], false, false),
+        create_control_input(vec![50, 50, 100, 50], false, false),
+
+        create_control_input(vec![50, 50, 0, 50], false, false),
+        create_control_input(vec![50, 50, 0, 50], false, false),
+        create_control_input(vec![50, 50, 0, 50], false, false),
+        create_control_input(vec![50, 50, 0, 50], false, false),        create_control_input(vec![50, 50, 50, 50], false, false),
+        create_control_input(vec![50, 50, 50, 50], false, false),
+
+        create_control_input(vec![50, 50, 100, 50], false, false),
+        create_control_input(vec![50, 50, 100, 50], false, false),
+        create_control_input(vec![50, 50, 100, 50], false, false),
+        create_control_input(vec![50, 50, 100, 50], false, false),
+
+        create_control_input(vec![50, 50, 0, 50], false, false),
+        create_control_input(vec![50, 50, 0, 50], false, false),
+        create_control_input(vec![50, 50, 0, 50], false, false),
+        create_control_input(vec![50, 50, 0, 50], false, false),
+    ]
+}
+
+impl PreProgrammed {
+    pub fn new() -> Self {
+        let inputs = shikanoko();
         PreProgrammed { current: 0, inputs }
     }
 }

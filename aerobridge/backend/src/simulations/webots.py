@@ -35,6 +35,7 @@ class Disturbances:
         dist = Disturbances()
         dist.pitch = -2.0 * get_channel_scaled(ci, ChannelId.RightY)
         dist.yaw = -1.3 * get_channel_scaled(ci, ChannelId.LeftX)
+        dist.roll = -2.0 * get_channel_scaled(ci, ChannelId.RightX)
         return dist
 
 def clamp(value, low, high):
@@ -117,6 +118,7 @@ class Webots(AbstractDrone):
         dist = Disturbances.mapControlInput(self.ci)
         pitch_disturbance = dist.pitch
         yaw_disturbance = dist.yaw
+        roll_disturbance = dist.roll
 
         roll_input = k_roll_p * clamp(self.sensor_data.imu.x, -1.0, 1.0) + roll_velocity + roll_disturbance
         pitch_input = k_pitch_p * clamp(self.sensor_data.imu.y, -1.0, 1.0) + pitch_velocity + pitch_disturbance
