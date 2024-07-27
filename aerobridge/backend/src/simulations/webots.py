@@ -61,6 +61,8 @@ class Webots(AbstractDrone):
         self.compass.enable(self.timestep)
         self.gyro = self.robot.getDevice("gyro")
         self.gyro.enable(self.timestep)
+        self.accel = self.robot.getDevice("accelerometer")
+        self.accel.enable(self.timestep)
 
         self.camera_roll_motor = self.robot.getDevice("camera roll")
         self.camera_pitch_motor = self.robot.getDevice("camera pitch")
@@ -98,6 +100,14 @@ class Webots(AbstractDrone):
         time = self.robot.getTime()
 
         with self.sensor_data_lock:
+            print("#############################################################")
+            print("Time: ", time)
+            print("imu: ", self.imu.getRollPitchYaw())
+            print("accel: ", self.accel.getValues())
+            print("gyro: ", self.gyro.getValues())
+            print("gps: ", self.gps.getValues())
+            print("compass: ", self.compass.getValues())
+            print("#############################################################")
             roll, pitch, yaw = self.imu.getRollPitchYaw()
             altitude = self.gps.getValues()[2]
             self.sensor_data = SensorData(ImuData(roll, pitch, yaw), altitude)
