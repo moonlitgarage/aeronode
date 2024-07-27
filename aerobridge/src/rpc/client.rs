@@ -1,4 +1,5 @@
 use std::error::Error;
+use aeroapi::data::sensors::{Altimeter, Magnetometer};
 use log::{error, info};
 use serde_json;
 use tokio::sync::mpsc::UnboundedSender;
@@ -83,8 +84,8 @@ impl AeroBridge {
                     .ok_or("Missing or invalid IMU z value")?;
 
                 let sensor_data = aeroapi::data::sensors::Sensors::new(
-                    Some(altitude as f32),
-                    Some(aeroapi::data::commons::Vec3d{x: x as f32, y: y as f32, z: z as f32}),
+                    Some(Altimeter {pressure: altitude as f32}),
+                    Some(Magnetometer {x: x as f32, y: y as f32, z: z as f32}),
                     None,
                     None,
                 );

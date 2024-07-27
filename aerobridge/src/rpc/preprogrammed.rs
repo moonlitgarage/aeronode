@@ -342,9 +342,15 @@ fn shikanoko() -> Vec<Controller> {
     ]
 }
 
+fn rotate() -> Vec<Controller> {
+    vec![
+        create_control_input(vec![50, 60, 50, 50], false, false),
+    ]
+}
+
 impl PreProgrammed {
     pub fn new() -> Self {
-        let inputs = shikanoko();
+        let inputs = inputs_1();
         PreProgrammed { current: 0, inputs }
     }
 }

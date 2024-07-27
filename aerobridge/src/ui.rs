@@ -1,4 +1,4 @@
-use aeroapi::data::{commands::Controller, commons::Vec3d};
+use aeroapi::data::{commands::Controller, sensors::{Altimeter, Magnetometer}};
 use ratatui::{
     buffer::Buffer, layout::{
         Alignment, 
@@ -210,16 +210,16 @@ impl Widget for ControlsWidget<'_> {
 
 pub struct InstrumentWidget<'a> {
     block: Option<Block<'a>>,
-    magnetometer: Option<Vec3d>,
-    altimeter: Option<f32>,
+    magnetometer: Option<Magnetometer>,
+    altimeter: Option<Altimeter>,
     heading: Option<f32>,
     airspeed: Option<f32>,
 }
 
 impl<'a> InstrumentWidget<'a> {
     pub fn new(
-        magnetometer: Option<Vec3d>,
-        altimeter: Option<f32>,
+        magnetometer: Option<Magnetometer>,
+        altimeter: Option<Altimeter>,
         heading: Option<f32>,
         airspeed: Option<f32>,
     ) -> Self {
@@ -276,13 +276,16 @@ impl Widget for InstrumentWidget<'_> {
         ]);
 
         let magnetometer = match self.magnetometer {
-            Some(mag) => Line::from(vec![
-                Span::raw("Magnetometer: "),
-                Span::styled(
-                    format!("X:{:.2} Y:{:.2} Z:{:.2}", mag.x, mag.y, mag.z),
-                    Style::default().fg(Color::Magenta),
-                ),
-            ]),
+            Some(mag) => {
+                let bearing = (mag.x.powi(2) + mag.y.powi(2)).sqrt().atan2(mag.z).to_degrees();
+                Line::from(vec![
+                    Span::raw("Magnetometer: "),
+                    Span::styled(
+                        format!("X:{:.2} Y:{:.2} Z:{:.2}", mag.x, mag.y, mag.z),
+                        Style::default().fg(Color::Magenta),
+                    ),
+                ])
+            },
             None => Line::from(vec![
                 Span::raw("Magnetometer: "),
                 Span::styled("N/A", Style::default().fg(Color::Red)),

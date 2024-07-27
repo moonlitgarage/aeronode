@@ -1,53 +1,79 @@
 use serde::{Deserialize, Serialize};
-use crate::data::commons::Vec3d;
+
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+pub struct Altimeter {
+    pub pressure: f32,
+}
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+pub struct Magnetometer {
+    pub x: f32,
+    pub y: f32,
+    pub z: f32,
+}
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+pub struct Accelerometer {
+    pub x: f32,
+    pub y: f32,
+    pub z: f32,
+}
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+pub struct Gyroscope {
+    pub x: f32,
+    pub y: f32,
+    pub z: f32,
+}
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct Sensors {
-    altimeter: Option<f32>,
-    magnetometer: Option<Vec3d>,
-    accelerometer: Option<Vec3d>,
-    gyroscope: Option<Vec3d>,
+    altimeter: Option<Altimeter>,
+    magnetometer: Option<Magnetometer>,
+    accelerometer: Option<Accelerometer>,
+    gyroscope: Option<Gyroscope>,
 }
 
 impl Sensors {
     pub fn new(
-        altimeter: Option<f32>,
-        magnetometer: Option<Vec3d>,
-        accelerometer: Option<Vec3d>,
-        gyroscope: Option<Vec3d>,
+        altimeter: Option<Altimeter>,
+        magnetometer: Option<Magnetometer>,
+        accelerometer: Option<Accelerometer>,
+        gyroscope: Option<Gyroscope>,
     ) -> Self {
         Self { altimeter, magnetometer, accelerometer, gyroscope }
     }
 
-    pub fn with_altimeter(self, altimeter: f32) -> Self {
+    pub fn with_altimeter(self, altimeter: Altimeter) -> Self {
         Self { altimeter: Some(altimeter), ..self }
     }
 
-    pub fn with_magnetometer(self, magnetometer: Vec3d) -> Self {
+    pub fn with_magnetometer(self, magnetometer: Magnetometer) -> Self {
         Self { magnetometer: Some(magnetometer), ..self }
     }
 
-    pub fn with_accelerometer(self, accelerometer: Vec3d) -> Self {
+    pub fn with_accelerometer(self, accelerometer: Accelerometer) -> Self {
         Self { accelerometer: Some(accelerometer), ..self }
     }
 
-    pub fn with_gyroscope(self, gyroscope: Vec3d) -> Self {
+    pub fn with_gyroscope(self, gyroscope: Gyroscope) -> Self {
         Self { gyroscope: Some(gyroscope), ..self }
     }
 
-    pub fn altimeter(&self) -> Option<f32> {
+    pub fn altimeter(&self) -> Option<Altimeter> {
         self.altimeter
     }
 
-    pub fn magnetometer(&self) -> Option<Vec3d> {
+    pub fn magnetometer(&self) -> Option<Magnetometer> {
         self.magnetometer.clone()
     }
 
-    pub fn accelerometer(&self) -> Option<Vec3d> {
+    pub fn accelerometer(&self) -> Option<Accelerometer> {
         self.accelerometer.clone()
     }
 
-    pub fn gyroscope(&self) -> Option<Vec3d> {
+    pub fn gyroscope(&self) -> Option<Gyroscope> {
         self.gyroscope.clone()
     }
 }
