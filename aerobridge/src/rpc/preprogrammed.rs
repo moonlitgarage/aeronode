@@ -204,30 +204,30 @@ fn inputs_1() -> Vec<Controller> {
 
 fn shikanoko() -> Vec<Controller> {
     vec![
-        create_control_input(vec![50, 50, 50, 50], false, false),
-        create_control_input(vec![50, 50, 50, 50], false, false),
-        create_control_input(vec![50, 50, 50, 50], false, false),
-        create_control_input(vec![50, 50, 50, 50], false, false),
-        create_control_input(vec![50, 50, 50, 50], false, false),
-        create_control_input(vec![50, 50, 50, 50], false, false),
-        create_control_input(vec![50, 50, 50, 50], false, false),
-        create_control_input(vec![50, 50, 50, 50], false, false),
-        create_control_input(vec![50, 50, 50, 50], false, false),
-        create_control_input(vec![50, 50, 50, 50], false, false),
-        create_control_input(vec![50, 50, 50, 50], false, false),
-        create_control_input(vec![50, 50, 50, 50], false, false),
-        create_control_input(vec![50, 50, 50, 50], false, false),
-        create_control_input(vec![50, 50, 50, 50], false, false),
-        create_control_input(vec![50, 50, 50, 50], false, false),
-        create_control_input(vec![50, 50, 50, 50], false, false),
-        create_control_input(vec![50, 50, 50, 50], false, false),
-        create_control_input(vec![50, 50, 50, 50], false, false),
-        create_control_input(vec![50, 50, 50, 50], false, false),
-        create_control_input(vec![50, 50, 50, 50], false, false),
-        create_control_input(vec![50, 50, 50, 50], false, false),
-        create_control_input(vec![50, 50, 50, 50], false, false),
-        create_control_input(vec![50, 50, 50, 50], false, false),
-        create_control_input(vec![50, 50, 50, 50], false, false),
+        // create_control_input(vec![50, 50, 50, 50], false, false),
+        // create_control_input(vec![50, 50, 50, 50], false, false),
+        // create_control_input(vec![50, 50, 50, 50], false, false),
+        // create_control_input(vec![50, 50, 50, 50], false, false),
+        // create_control_input(vec![50, 50, 50, 50], false, false),
+        // create_control_input(vec![50, 50, 50, 50], false, false),
+        // create_control_input(vec![50, 50, 50, 50], false, false),
+        // create_control_input(vec![50, 50, 50, 50], false, false),
+        // create_control_input(vec![50, 50, 50, 50], false, false),
+        // create_control_input(vec![50, 50, 50, 50], false, false),
+        // create_control_input(vec![50, 50, 50, 50], false, false),
+        // create_control_input(vec![50, 50, 50, 50], false, false),
+        // create_control_input(vec![50, 50, 50, 50], false, false),
+        // create_control_input(vec![50, 50, 50, 50], false, false),
+        // create_control_input(vec![50, 50, 50, 50], false, false),
+        // create_control_input(vec![50, 50, 50, 50], false, false),
+        // create_control_input(vec![50, 50, 50, 50], false, false),
+        // create_control_input(vec![50, 50, 50, 50], false, false),
+        // create_control_input(vec![50, 50, 50, 50], false, false),
+        // create_control_input(vec![50, 50, 50, 50], false, false),
+        // create_control_input(vec![50, 50, 50, 50], false, false),
+        // create_control_input(vec![50, 50, 50, 50], false, false),
+        // create_control_input(vec![50, 50, 50, 50], false, false),
+        // create_control_input(vec![50, 50, 50, 50], false, false),
 
         create_control_input(vec![50, 50, 50, 50], false, false),
         create_control_input(vec![50, 50, 50, 50], false, false),
@@ -316,7 +316,8 @@ fn shikanoko() -> Vec<Controller> {
         create_control_input(vec![50, 50, 0, 50], false, false),
         create_control_input(vec![50, 50, 0, 50], false, false),
         create_control_input(vec![50, 50, 0, 50], false, false),
-        create_control_input(vec![50, 50, 0, 50], false, false),        create_control_input(vec![50, 50, 50, 50], false, false),
+        create_control_input(vec![50, 50, 0, 50], false, false),        
+        create_control_input(vec![50, 50, 50, 50], false, false),
         create_control_input(vec![50, 50, 50, 50], false, false),
 
         create_control_input(vec![50, 50, 100, 50], false, false),
@@ -327,7 +328,8 @@ fn shikanoko() -> Vec<Controller> {
         create_control_input(vec![50, 50, 0, 50], false, false),
         create_control_input(vec![50, 50, 0, 50], false, false),
         create_control_input(vec![50, 50, 0, 50], false, false),
-        create_control_input(vec![50, 50, 0, 50], false, false),        create_control_input(vec![50, 50, 50, 50], false, false),
+        create_control_input(vec![50, 50, 0, 50], false, false),        
+        create_control_input(vec![50, 50, 50, 50], false, false),
         create_control_input(vec![50, 50, 50, 50], false, false),
 
         create_control_input(vec![50, 50, 100, 50], false, false),
@@ -350,7 +352,7 @@ fn rotate() -> Vec<Controller> {
 
 impl PreProgrammed {
     pub fn new() -> Self {
-        let inputs = inputs_1();
+        let inputs = shikanoko();
         PreProgrammed { current: 0, inputs }
     }
 }
