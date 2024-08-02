@@ -9739,7 +9739,7 @@
 				)
 			)
 		)
-		(property "Footprint" "QFN24_3X3X0P9_IVS"
+		(property "Footprint" "Connector_PinHeader_1.00mm:PinHeader_2x09_P1.00mm_Vertical"
 			(at 200.66 127 0)
 			(effects
 				(font
@@ -11789,7 +11789,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "LIS3MDL:XDCR_LIS3MDL"
+		(property "Footprint" "Connector_PinHeader_1.00mm:PinHeader_2x06_P1.00mm_Vertical"
 			(at 156.21 132.08 0)
 			(effects
 				(font
@@ -14118,7 +14118,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Capacitor_SMD:C_0603_1608Metric_Pad1.08x0.95mm_HandSolder"
 			(at 145.0848 109.22 0)
 			(effects
 				(font
@@ -14415,7 +14415,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder"
 			(at 264.922 147.32 90)
 			(effects
 				(font
@@ -15002,7 +15002,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Capacitor_SMD:C_0603_1608Metric_Pad1.08x0.95mm_HandSolder"
 			(at 191.77 148.8948 0)
 			(effects
 				(font
