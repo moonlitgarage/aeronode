@@ -1,6 +1,7 @@
 // import React, { useRef } from 'react'
 // import { useFrame, useLoader } from '@react-three/fiber'
-import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';// import { Group } from 'three'
+import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
+// import { Group } from 'three'
 import { DragControls, TransformControls } from '@react-three/drei'
 
 import { useFrame, useLoader } from "@react-three/fiber"
