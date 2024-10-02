@@ -1,9 +1,9 @@
 import { LINK_DOCS, LINK_GITHUB } from "@/common/constants";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import ThreeDScence from "@/components/ui/threedscene";
 import { H1, H3, List } from "@/components/ui/typography";
 import { Link } from "react-router-dom";
+import AeronodeImage from "../../public/images/aeronode.png";
 
 export default function HomePage() {
     return (
@@ -21,8 +21,11 @@ export default function HomePage() {
                 </div>
                 <div className="p-12 flex flex-row">
                     <div className="grow"/>
-                    <div className="w-1/2 max-w-3xl aspect-video">
+                    {/* <div className="w-1/2 max-w-3xl aspect-video">
                         <ThreeDScence />
+                    </div> */}
+                    <div className="w-1/2 max-w-3xl">
+                        <img src={AeronodeImage} alt="AeroNode" className="w-full"/>
                     </div>
                     <div className="grow"/>
                 </div>
