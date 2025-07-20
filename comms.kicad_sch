@@ -1,0 +1,14 @@
+(kicad_sch
+	(version 20250114)
+	(generator "eeschema")
+	(generator_version "9.0")
+	(uuid "433bc817-c03e-46de-8739-42ce85c42847")
+	(paper "A4")
+	(title_block
+		(title "aeronode")
+		(date "2025-04-18")
+		(rev "0.1")
+		(company "Moonlit Garage, Inc")
+	)
+	(lib_symbols)
+)

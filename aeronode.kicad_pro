@@ -625,6 +625,14 @@
     [
       "8ee6798e-c040-45a9-ad9a-d9f9bd5d648c",
       "Root"
+    ],
+    [
+      "b1ecee5d-65bd-4a77-801e-5595ed232cc5",
+      "comms"
+    ],
+    [
+      "615a2019-c205-4a17-b68c-0d86861438d5",
+      "peripherals"
     ]
   ],
   "text_variables": {}
